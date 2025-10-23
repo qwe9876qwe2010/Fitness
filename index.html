@@ -41,6 +41,55 @@
             background: white;
             border-radius: 5px;
             padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #ddd;
+        }
+        
+        .exercise-detail {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .detail-content {
+            background: white;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #666;
+        }
+        
+        .detail-title {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-section {
+            margin-bottom: 20px;
+        }
+        
+        .steps-list {
+            padding-left: 20px;
         }
         
     </style>
@@ -53,46 +102,103 @@
 
     <div class="exercises-container">
         <div class="exercise-grid">
-            <div class="exercise-item">
+            <div class="exercise-item" data-exercise="bench-press">
                 <h3>平板卧推</h3>
                 <p>部位: 胸部</p>
             </div>
             
-            <div class="exercise-item">
+            <div class="exercise-item" data-exercise="incline-press">
                 <h3>上斜卧推</h3>
                 <p>部位: 胸部</p>
             </div>
             
-            <div class="exercise-item">
+            <div class="exercise-item" data-exercise="bent-over-row">
                 <h3>俯身划船</h3>
                 <p>部位: 背部</p>
             </div>
             
-            <div class="exercise-item">
+            <div class="exercise-item" data-exercise="deadlift">
                 <h3>硬拉</h3>
                 <p>部位: 背部</p>
             </div>
 
-            <div class="exercise-item">
+            <div class="exercise-item" data-exercise="squat">
                 <h3>深蹲</h3>
                 <p>部位: 腿部</p>
             </div>
             
-            <div class="exercise-item">
+            <div class="exercise-item" data-exercise="leg-extension">
                 <h3>腿屈伸</h3>
                 <p>部位: 腿部</p>
             </div>
             
-            <div class="exercise-item">
+            <div class="exercise-item" data-exercise="dumbbell-press">
                 <h3>哑铃推举</h3>
                 <p>部位: 肩部</p>
             </div>
             
-            <div class="exercise-item">
+            <div class="exercise-item" data-exercise="lateral-raise">
                 <h3>侧平举</h3>
                 <p>部位: 肩部</p>
             </div>
+        </div>
     </div>
 
+    <div id="bench-press" class="exercise-detail">
+        <div class="detail-content">
+            <button class="close-btn">&times;</button>
+            <h2 class="detail-title">平板卧推</h2>
+            <div class="detail-section">
+                <h3>训练部位</h3>
+                <p>胸部、肩部、肱三头肌</p>
+            </div>
+            
+            <div class="detail-section">
+                <h3>动作描述</h3>
+                <p>平板卧推是胸部训练的基础动作，主要锻炼胸大肌，同时也能锻炼到肩部和手臂肌肉。这是增加胸部力量和体积最有效的动作之一。</p>
+            </div>
+            
+            <div class="detail-section">
+                <h3>动作步骤</h3>
+                <ol class="steps-list">
+                    <li>平躺在卧推凳上，双脚稳固地踩在地面上</li>
+                    <li>双手握住杠铃，比肩略宽，掌心向前</li>
+                    <li>从架上取下杠铃，伸直手臂，使杠铃位于胸部正上方</li>
+                    <li>缓慢下降杠铃至胸部，保持肘部与身体呈约45度角</li>
+                    <li>当杠铃轻触胸部后，用力推起杠铃至起始位置</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 为每个动作卡片添加点击事件
+        document.querySelectorAll('.exercise-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const exerciseId = this.getAttribute('data-exercise');
+                const detailPage = document.getElementById(exerciseId);
+                
+                if (detailPage) {
+                    detailPage.style.display = 'block';
+                }
+            });
+        });
+        
+        // 为所有关闭按钮添加点击事件
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.exercise-detail').style.display = 'none';
+            });
+        });
+        
+        // 点击详情页面背景关闭详情
+        document.querySelectorAll('.exercise-detail').forEach(detail => {
+            detail.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
