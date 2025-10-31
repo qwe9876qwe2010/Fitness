@@ -1133,7 +1133,7 @@
         // 日历相关变量
         let currentDate = new Date();
 
-        // 计时器相关变量
+        // 计时器相关变量（移到全局作用域）
         let restTimer = null;
         let restTimeLeft = 60; // 默认60秒
 
@@ -1271,14 +1271,14 @@
             // +10秒按钮
             add10sBtn.addEventListener("click", function() {
                 restTimeLeft += 10;
-                updateTimerDisplay();
+                updateTimerDisplay(timerDisplay);
             });
             
             // -10秒按钮
             subtract10sBtn.addEventListener("click", function() {
                 if (restTimeLeft > 10) {
                     restTimeLeft -= 10;
-                    updateTimerDisplay();
+                    updateTimerDisplay(timerDisplay);
                 }
             });
             
@@ -1288,77 +1288,93 @@
                 timerModal.style.display = "none";
                 // 重置计时器
                 restTimeLeft = 60;
-                updateTimerDisplay();
+                updateTimerDisplay(timerDisplay);
             });
             
-            // 更新计时器显示
-            function updateTimerDisplay() {
-                const minutes = Math.floor(restTimeLeft / 60);
-                const seconds = restTimeLeft % 60;
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }
-            
-            // 开始计时器
-            function startTimer() {
-                if (restTimer) {
-                    clearInterval(restTimer);
-                }
-                
-                restTimer = setInterval(function() {
-                    restTimeLeft--;
-                    updateTimerDisplay();
-                    
-                    if (restTimeLeft <= 0) {
-                        stopTimer();
-                        timerDisplay.textContent = "时间到!";
-                        
-                        // 播放提示音
-                        playBeepSound();
-                        
-                        // 3秒后自动关闭
-                        setTimeout(function() {
-                            timerModal.style.display = "none";
-                            // 重置计时器
-                            restTimeLeft = 60;
-                            updateTimerDisplay();
-                        }, 3000);
-                    }
-                }, 1000);
-            }
-            
-            // 停止计时器
-            function stopTimer() {
-                if (restTimer) {
-                    clearInterval(restTimer);
-                    restTimer = null;
-                }
-            }
-            
-            // 播放提示音
-            function playBeepSound() {
-                try {
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-                    
-                    oscillator.frequency.value = 800;
-                    oscillator.type = 'sine';
-                    
-                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
-                    
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 1);
-                } catch (e) {
-                    console.log("无法播放提示音:", e);
-                }
-            }
-            
             // 初始显示
-            updateTimerDisplay();
+            updateTimerDisplay(timerDisplay);
+        }
+
+        // 更新计时器显示（移到全局作用域）
+        function updateTimerDisplay(timerDisplay) {
+            const minutes = Math.floor(restTimeLeft / 60);
+            const seconds = restTimeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // 开始计时器（移到全局作用域）
+        function startTimer() {
+            const timerDisplay = document.getElementById("timer-display");
+            
+            if (restTimer) {
+                clearInterval(restTimer);
+            }
+            
+            // 立即更新一次显示
+            updateTimerDisplay(timerDisplay);
+            
+            restTimer = setInterval(function() {
+                restTimeLeft--;
+                updateTimerDisplay(timerDisplay);
+                
+                if (restTimeLeft <= 0) {
+                    stopTimer();
+                    timerDisplay.textContent = "时间到!";
+                    
+                    // 播放提示音
+                    playBeepSound();
+                    
+                    // 3秒后自动关闭
+                    setTimeout(function() {
+                        const timerModal = document.getElementById("timer-modal");
+                        timerModal.style.display = "none";
+                        // 重置计时器
+                        restTimeLeft = 60;
+                        updateTimerDisplay(timerDisplay);
+                    }, 3000);
+                }
+            }, 1000);
+        }
+
+        // 停止计时器（移到全局作用域）
+        function stopTimer() {
+            if (restTimer) {
+                clearInterval(restTimer);
+                restTimer = null;
+            }
+        }
+
+        // 播放提示音（移到全局作用域）
+        function playBeepSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 1);
+            } catch (e) {
+                console.log("无法播放提示音:", e);
+            }
+        }
+
+        // 显示计时器弹窗（修复版本）
+        function showTimerModal() {
+            const timerModal = document.getElementById("timer-modal");
+            timerModal.style.display = "flex";
+            // 重置计时器为60秒
+            restTimeLeft = 60;
+            // 立即开始计时
+            startTimer();
         }
 
         // 从元素获取日期字符串
@@ -1670,17 +1686,6 @@
                     }
                 });
             });
-        }
-
-        // 显示计时器弹窗
-        function showTimerModal() {
-            const timerModal = document.getElementById("timer-modal");
-            timerModal.style.display = "flex";
-            // 重置计时器为60秒
-            restTimeLeft = 60;
-            updateTimerDisplay();
-            // 自动开始计时
-            startTimer(); // 修复：确保调用startTimer函数
         }
 
         // 获取动作的训练数据
