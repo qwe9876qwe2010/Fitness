@@ -201,37 +201,11 @@
         color: #0c5460;
       }
 
-      .add-to-plan-btn {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: #4a90e2;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 35px;
-        height: 35px;
-        cursor: pointer;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 2;
-        transition: all 0.3s;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
-
-      .add-to-plan-btn:hover {
-        background: #2a6dc7;
-        transform: scale(1.1);
-      }
-
       .exercise-item h3 {
         margin: 0 0 12px 0;
         font-size: 20px;
         color: #333;
         line-height: 1.3;
-        padding-right: 45px;
       }
 
       .exercise-item p {
@@ -253,14 +227,14 @@
         padding: 6px 12px;
         border-radius: 20px;
         font-size: 13px;
-        cursor: pointer;
+        cursor: default;
         transition: all 0.3s;
       }
 
       .muscle-tag:hover {
-        background: #4a90e2;
-        color: white;
-        transform: translateY(-2px);
+        background: #e9ecef;
+        color: #495057;
+        transform: none;
       }
 
       .no-results {
@@ -634,8 +608,7 @@
       }
 
       /* 详情页面样式 */
-      .exercise-detail,
-      .muscle-detail {
+      .exercise-detail {
         display: none;
         position: fixed;
         top: 0;
@@ -716,29 +689,6 @@
         font-size: 16px;
       }
 
-      .muscle-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 15px;
-      }
-
-      .muscle-tag {
-        background: #e9ecef;
-        color: #495057;
-        padding: 8px 15px;
-        border-radius: 20px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.3s;
-      }
-
-      .muscle-tag:hover {
-        background: #4a90e2;
-        color: white;
-        transform: translateY(-2px);
-      }
-
       .tips-list {
         background: #f8f9fa;
         padding: 20px;
@@ -749,39 +699,6 @@
       .tips-list li {
         margin-bottom: 12px;
         line-height: 1.6;
-      }
-
-      .muscle-info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 25px;
-        margin-top: 20px;
-      }
-
-      .muscle-function,
-      .muscle-exercises {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 10px;
-      }
-
-      .muscle-function h4,
-      .muscle-exercises h4 {
-        margin-bottom: 15px;
-        color: #444;
-        font-size: 18px;
-      }
-
-      .exercise-link {
-        color: #4a90e2;
-        cursor: pointer;
-        text-decoration: underline;
-        transition: color 0.3s;
-        font-weight: 500;
-      }
-
-      .exercise-link:hover {
-        color: #2a6dc7;
       }
 
       @media (max-width: 768px) {
@@ -801,10 +718,6 @@
 
         .detail-title {
           font-size: 26px;
-        }
-
-        .muscle-info-grid {
-          grid-template-columns: 1fr;
         }
 
         .calendar-day {
@@ -922,111 +835,8 @@
     </div>
 
     <!-- 动作详情页面将通过JavaScript动态生成 -->
-    <!-- 肌肉详情页面将通过JavaScript动态生成 -->
 
     <script>
-      // 肌肉数据 - 包含肌肉的详细介绍
-      const musclesData = {
-        胸大肌: {
-          name: "胸大肌",
-          description:
-            "胸大肌是胸部最大的肌肉，分为锁骨部、胸肋部和腹部三部分。它负责肩关节的内收、内旋和屈曲。",
-          function:
-            "主要功能是使上臂内收、内旋和前屈。在推、抱、投掷等动作中起主要作用。",
-          exercises: ["bench-press", "incline-press"],
-          image:
-            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        },
-        三角肌前束: {
-          name: "三角肌前束",
-          description: "三角肌前束位于肩部前方，负责肩关节的屈曲和内旋。",
-          function: "主要功能是使肩关节前屈和内旋，参与推举类动作。",
-          exercises: ["dumbbell-press"],
-          image: "images/deltoid-muscle.png",
-        },
-        三角肌中束: {
-          name: "三角肌中束",
-          description: "三角肌中束位于肩部侧面，负责肩关节的外展。",
-          function: "主要功能是使肩关节外展，负责肩部宽度和轮廓。",
-          exercises: ["lateral-raise"],
-          image:
-            "https://images.unsplash.com/photo-1576671414121-aa0f3396c8c3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        },
-        肱三头肌: {
-          name: "肱三头肌",
-          description:
-            "肱三头肌位于上臂后方，是上臂最大的肌肉，负责肘关节的伸展。",
-          function: "主要功能是伸展肘关节，在推、举等动作中起重要作用。",
-          exercises: ["bench-press", "incline-press", "dumbbell-press"],
-          image:
-            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        },
-        背阔肌: {
-          name: "背阔肌",
-          description:
-            "背阔肌是背部最大的肌肉，呈三角形，负责肩关节的内收、伸展和内旋。",
-          function: "主要功能是使上臂内收、后伸和内旋，负责背部的宽度和厚度。",
-          exercises: ["bent-over-row", "deadlift"],
-          image:
-            "https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        },
-        菱形肌: {
-          name: "菱形肌",
-          description:
-            "菱形肌位于上背部，分为大菱形肌和小菱形肌，负责肩胛骨的内收和上提。",
-          function: "主要功能是使肩胛骨内收和上提，改善姿势和背部稳定性。",
-          exercises: ["bent-over-row"],
-          image:
-            "https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        },
-        竖脊肌: {
-          name: "竖脊肌",
-          description: "竖脊肌是脊柱两侧的肌肉群，负责脊柱的伸展和侧屈。",
-          function: "主要功能是伸展脊柱，维持躯干直立姿势。",
-          exercises: ["deadlift", "bent-over-row"],
-          image:
-            "https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        },
-        臀大肌: {
-          name: "臀大肌",
-          description:
-            "臀大肌是臀部最大的肌肉，也是人体最强大的肌肉之一，负责髋关节的伸展和外旋。",
-          function:
-            "主要功能是伸展和外旋髋关节，在行走、跑步和跳跃中起关键作用。",
-          exercises: ["squat", "deadlift"],
-          image:
-            "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        },
-        股四头肌: {
-          name: "股四头肌",
-          description:
-            "股四头肌是大腿前侧的肌肉群，由四个头组成，负责膝关节的伸展。",
-          function: "主要功能是伸展膝关节，在行走、跑步和跳跃中起重要作用。",
-          exercises: ["squat", "leg-extension"],
-          image:
-            "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        },
-        腘绳肌: {
-          name: "腘绳肌",
-          description:
-            "腘绳肌是大腿后侧的肌肉群，由三个肌肉组成，负责膝关节的屈曲和髋关节的伸展。",
-          function:
-            "主要功能是屈曲膝关节和伸展髋关节，与股四头肌形成拮抗关系。",
-          exercises: ["deadlift", "squat"],
-          image:
-            "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        },
-        上胸大肌: {
-          name: "上胸大肌",
-          description: "上胸大肌是胸大肌的上部纤维，位于锁骨下方。",
-          function:
-            "主要功能是使上臂内收和前屈，特别在上斜角度下的推举动作中起主要作用。",
-          exercises: ["incline-press"],
-          image:
-            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        },
-      };
-
       // 动作数据 - 包含详情、步骤和图片信息
       const exercises = [
         // 热身动作
@@ -1418,9 +1228,6 @@
         // 创建详情页面
         createDetailPages();
 
-        // 创建肌肉详情页面
-        createMuscleDetailPages();
-
         // 初始化日历
         renderCalendar();
 
@@ -1439,19 +1246,6 @@
           button.addEventListener("click", function () {
             // 移除所有按钮的active类
             bodypartButtons.forEach((btn) => btn.classList.remove("active"));
-            // 为当前点击的按钮添加active类
-            this.classList.add("active");
-            // 筛选动作
-            filterExercises();
-          });
-        });
-
-        // 类型筛选功能
-        const typeButtons = document.querySelectorAll(".type-btn");
-        typeButtons.forEach((button) => {
-          button.addEventListener("click", function () {
-            // 移除所有按钮的active类
-            typeButtons.forEach((btn) => btn.classList.remove("active"));
             // 为当前点击的按钮添加active类
             this.classList.add("active");
             // 筛选动作
@@ -1510,7 +1304,7 @@
         document.addEventListener("click", function (e) {
           if (e.target.classList.contains("close-btn")) {
             e.target.closest(
-              ".exercise-detail, .muscle-detail, .plan-detail"
+              ".exercise-detail, .plan-detail"
             ).style.display = "none";
           }
         });
@@ -1519,42 +1313,9 @@
         document.addEventListener("click", function (e) {
           if (
             e.target.classList.contains("exercise-detail") ||
-            e.target.classList.contains("muscle-detail") ||
             e.target.classList.contains("plan-detail")
           ) {
             e.target.style.display = "none";
-          }
-        });
-
-        // 为肌肉标签添加点击事件（通过事件委托）
-        document.addEventListener("click", function (e) {
-          if (e.target.classList.contains("muscle-tag")) {
-            const muscleName = e.target.textContent;
-            const muscleDetail = document.getElementById(
-              `muscle-${muscleName}`
-            );
-            if (muscleDetail) {
-              muscleDetail.style.display = "block";
-            }
-          }
-        });
-
-        // 为动作链接添加点击事件（通过事件委托）
-        document.addEventListener("click", function (e) {
-          if (e.target.classList.contains("exercise-link")) {
-            const exerciseId = e.target.getAttribute("data-exercise-id");
-            const currentDetail = e.target.closest(
-              ".exercise-detail, .muscle-detail"
-            );
-
-            if (currentDetail) {
-              currentDetail.style.display = "none";
-            }
-
-            const exerciseDetail = document.getElementById(exerciseId);
-            if (exerciseDetail) {
-              exerciseDetail.style.display = "block";
-            }
           }
         });
       });
@@ -1585,9 +1346,6 @@
 
           exerciseItem.innerHTML = `
                     ${typeBadge}
-                    <button class="add-to-plan-btn" data-exercise="${
-                      exercise.id
-                    }">+</button>
                     <h3>${exercise.name}</h3>
                     <p>部位: ${exercise.bodyPart}</p>
                     <div class="muscle-tags">
@@ -1609,31 +1367,6 @@
             }
           });
 
-          // 添加"加入计划"按钮事件
-          const addButton = exerciseItem.querySelector(".add-to-plan-btn");
-          addButton.addEventListener("click", function (e) {
-            e.stopPropagation();
-            const exerciseId = this.getAttribute("data-exercise");
-
-            // 切换到日历标签
-            document
-              .querySelectorAll(".tab")
-              .forEach((tab) => tab.classList.remove("active"));
-            document
-              .querySelector('.tab[data-tab="calendar"]')
-              .classList.add("active");
-
-            document
-              .querySelectorAll(".tab-content")
-              .forEach((content) => content.classList.remove("active"));
-            document.getElementById("calendar-tab").classList.add("active");
-
-            // 提示用户选择日期
-            alert(
-              `已选择"${exercise.name}"，请在日历中选择一个日期来添加此动作`
-            );
-          });
-
           exerciseGrid.appendChild(exerciseItem);
         });
       }
@@ -1645,8 +1378,6 @@
           .value.toLowerCase();
         const activeBodypart = document.querySelector(".bodypart-btn.active")
           .dataset.bodypart;
-        const activeType =
-          document.querySelector(".type-btn.active").dataset.type;
 
         const filteredExercises = exercises.filter((exercise) => {
           // 检查动作名称是否匹配
@@ -1661,14 +1392,8 @@
           const matchesBodypart =
             activeBodypart === "all" || exercise.bodyPart === activeBodypart;
 
-          // 检查类型是否匹配
-          const matchesType =
-            activeType === "all" || exercise.type === activeType;
-
           // 返回匹配结果：名称或肌肉匹配，并且部位和类型匹配
-          return (
-            (matchesName || matchesMuscles) && matchesBodypart && matchesType
-          );
+          return (matchesName || matchesMuscles) && matchesBodypart;
         });
 
         renderExercises(filteredExercises);
@@ -1745,60 +1470,6 @@
                 `;
 
           document.body.appendChild(detailPage);
-        });
-      }
-
-      // 创建肌肉详情页面
-      function createMuscleDetailPages() {
-        Object.keys(musclesData).forEach((muscleName) => {
-          const muscle = musclesData[muscleName];
-          const muscleDetail = document.createElement("div");
-          muscleDetail.id = `muscle-${muscleName}`;
-          muscleDetail.className = "muscle-detail";
-
-          muscleDetail.innerHTML = `
-                    <div class="detail-content">
-                        <button class="close-btn">&times;</button>
-                        <div class="detail-header">
-                            <h2 class="detail-title">${muscle.name}</h2>
-                        </div>
-                        
-                        <div class="detail-description">
-                            ${muscle.description}
-                        </div>
-                        
-                        ${
-                          muscle.image
-                            ? `<img src="${muscle.image}" alt="${muscle.name}" class="exercise-image">`
-                            : ""
-                        }
-                        
-                        <div class="muscle-info-grid">
-                            <div class="muscle-function">
-                                <h4>主要功能</h4>
-                                <p>${muscle.function}</p>
-                            </div>
-                            
-                            <div class="muscle-exercises">
-                                <h4>常见训练动作</h4>
-                                <ul class="steps-list">
-                                    ${muscle.exercises
-                                      .map((exerciseId) => {
-                                        const exercise = exercises.find(
-                                          (e) => e.id === exerciseId
-                                        );
-                                        return exercise
-                                          ? `<li><span class="exercise-link" data-exercise-id="${exerciseId}">${exercise.name}</span></li>`
-                                          : `<li>${exerciseId}</li>`;
-                                      })
-                                      .join("")}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-          document.body.appendChild(muscleDetail);
         });
       }
 
