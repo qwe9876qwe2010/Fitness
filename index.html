@@ -312,29 +312,16 @@
         border: 1px solid #eee;
         padding: 10px;
         border-radius: 8px;
-        cursor: pointer;
-        transition: background 0.3s, transform 0.2s;
         background: #f9f9f9;
-      }
-
-      .calendar-day:hover {
-        background: #f0f0f0;
-        transform: scale(1.02);
+        transition: background 0.3s;
       }
 
       .calendar-day.empty {
         background: #f5f5f5;
-        cursor: default;
       }
 
       .calendar-day.current-month {
         background: white;
-      }
-
-      .calendar-day.selected {
-        background: #e6f2ff;
-        border-color: #4a90e2;
-        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
       }
 
       .calendar-day.today {
@@ -1214,7 +1201,6 @@
 
       // 日历相关变量
       let currentDate = new Date();
-      let selectedDate = null;
 
       // 计时器相关变量
       let restTimer = null;
@@ -1284,20 +1270,6 @@
           .addEventListener("click", function () {
             currentDate.setMonth(currentDate.getMonth() + 1);
             renderCalendar();
-          });
-
-        // 添加动作功能
-        document
-          .getElementById("add-exercise-btn")
-          .addEventListener("click", function () {
-            const select = document.getElementById("add-exercise-select");
-            const exerciseId = select.value;
-
-            if (exerciseId && selectedDate) {
-              addExerciseToPlan(selectedDate, exerciseId);
-              renderPlanDetail(selectedDate);
-              renderCalendar();
-            }
           });
 
         // 为所有关闭按钮添加点击事件（通过事件委托）
@@ -1523,24 +1495,12 @@
             dayElement.classList.add("today");
           }
 
-          // 检查是否是选中日期
           const dateStr = `${year}-${month + 1}-${i}`;
-          if (selectedDate === dateStr) {
-            dayElement.classList.add("selected");
-          }
-
+          
           dayElement.innerHTML = `
                     <div class="day-number">${i}</div>
                     <div class="day-exercises" id="day-${dateStr}"></div>
                 `;
-
-          // 添加点击事件
-          dayElement.addEventListener("click", function () {
-            selectedDate = dateStr;
-            renderCalendar();
-            renderPlanDetail(dateStr);
-            document.getElementById("plan-detail").style.display = "block";
-          });
 
           calendarDays.appendChild(dayElement);
 
@@ -1589,232 +1549,6 @@
         }
       }
 
-      // 渲染训练计划详情
-      function renderPlanDetail(dateStr) {
-        document.getElementById(
-          "plan-date"
-        ).textContent = `训练计划 - ${dateStr}`;
-
-        const planExercisesElement = document.getElementById("plan-exercises");
-        planExercisesElement.innerHTML = "";
-
-        if (trainingPlans[dateStr] && trainingPlans[dateStr].length > 0) {
-          trainingPlans[dateStr].forEach((exerciseId) => {
-            const exercise = exercises.find((e) => e.id === exerciseId);
-            if (exercise) {
-              const exerciseItem = document.createElement("div");
-              exerciseItem.className = "plan-exercise-item";
-              exerciseItem.innerHTML = `
-                            <div class="exercise-header">
-                                <h3>${exercise.name}</h3>
-                                <button class="remove-exercise" data-exercise="${exerciseId}">删除</button>
-                            </div>
-                            <div class="sets-container" id="sets-${exerciseId}">
-                                <!-- 组数将通过JavaScript动态生成 -->
-                            </div>
-                            <button class="add-set-btn" data-exercise="${exerciseId}">添加一组</button>
-                            <div class="rest-timer-display" id="timer-${exerciseId}">
-                                <div>休息时间: <span id="timer-display-${exerciseId}">60</span>秒</div>
-                                <button id="stop-timer-${exerciseId}">停止计时</button>
-                            </div>
-                        `;
-              planExercisesElement.appendChild(exerciseItem);
-
-              // 渲染组数
-              renderSets(exerciseId);
-
-              // 添加删除按钮事件
-              const removeButton =
-                exerciseItem.querySelector(".remove-exercise");
-              removeButton.addEventListener("click", function () {
-                removeExerciseFromPlan(dateStr, exerciseId);
-                renderPlanDetail(dateStr);
-                renderCalendar();
-              });
-
-              // 添加组按钮事件
-              const addSetButton = exerciseItem.querySelector(".add-set-btn");
-              addSetButton.addEventListener("click", function () {
-                addSetToExercise(exerciseId);
-                renderSets(exerciseId);
-              });
-
-              // 添加计时器控制
-              const stopTimerButton = exerciseItem.querySelector(
-                `#stop-timer-${exerciseId}`
-              );
-              stopTimerButton.addEventListener("click", function () {
-                stopRestTimer();
-              });
-            }
-          });
-        } else {
-          planExercisesElement.innerHTML = "<p>这一天还没有安排训练</p>";
-        }
-      }
-
-      // 渲染组数
-      function renderSets(exerciseId) {
-        const setsContainer = document.getElementById(`sets-${exerciseId}`);
-        if (!setsContainer) return;
-
-        setsContainer.innerHTML = "";
-
-        // 获取或初始化组数数据
-        if (!trainingPlans[exerciseId]) {
-          trainingPlans[exerciseId] = {
-            sets: [],
-          };
-        }
-
-        // 渲染每组
-        trainingPlans[exerciseId].sets.forEach((set, index) => {
-          const setItem = document.createElement("div");
-          setItem.className = "set-item";
-
-          // 使用带单位的输入框
-          setItem.innerHTML = `
-                    <div class="set-number">第${index + 1}组</div>
-                    <div class="input-with-unit">
-                        <input type="number" class="set-input weight-input" placeholder="重量" value="${
-                          set.weight || ""
-                        }" data-exercise="${exerciseId}" data-set="${index}">
-                        <span class="unit-label">kg</span>
-                    </div>
-                    <div class="input-with-unit">
-                        <input type="number" class="set-input reps-input" placeholder="次数" value="${
-                          set.reps || ""
-                        }" data-exercise="${exerciseId}" data-set="${index}">
-                        <span class="unit-label">次</span>
-                    </div>
-                    <div class="rest-time-input-container">
-                        <input type="number" class="set-input rest-time-input" placeholder="休息" value="${
-                          set.restTime || 60
-                        }" data-exercise="${exerciseId}" data-set="${index}">
-                        <span class="unit-label">秒</span>
-                    </div>
-                    <button class="rest-timer-btn" data-exercise="${exerciseId}" data-set="${index}">开始休息</button>
-                `;
-          setsContainer.appendChild(setItem);
-
-          // 添加重量输入事件
-          const weightInput = setItem.querySelector(".weight-input");
-          weightInput.addEventListener("change", function () {
-            updateSetData(exerciseId, index, "weight", this.value);
-          });
-
-          // 添加次数输入事件
-          const repsInput = setItem.querySelector(".reps-input");
-          repsInput.addEventListener("change", function () {
-            updateSetData(exerciseId, index, "reps", this.value);
-          });
-
-          // 添加休息时间输入事件
-          const restTimeInput = setItem.querySelector(".rest-time-input");
-          restTimeInput.addEventListener("change", function () {
-            updateSetData(exerciseId, index, "restTime", this.value);
-          });
-
-          // 添加休息计时器按钮事件
-          const restButton = setItem.querySelector(".rest-timer-btn");
-          restButton.addEventListener("click", function () {
-            // 获取该组设置的休息时间
-            const restTime = parseInt(restTimeInput.value) || 60;
-            startRestTimer(exerciseId, index, restTime);
-          });
-        });
-      }
-
-      // 更新组数数据
-      function updateSetData(exerciseId, setIndex, field, value) {
-        if (!trainingPlans[exerciseId]) {
-          trainingPlans[exerciseId] = {
-            sets: [],
-          };
-        }
-
-        if (!trainingPlans[exerciseId].sets[setIndex]) {
-          trainingPlans[exerciseId].sets[setIndex] = {};
-        }
-
-        trainingPlans[exerciseId].sets[setIndex][field] = value;
-        saveTrainingPlans();
-      }
-
-      // 添加组数
-      function addSetToExercise(exerciseId) {
-        if (!trainingPlans[exerciseId]) {
-          trainingPlans[exerciseId] = {
-            sets: [],
-          };
-        }
-
-        trainingPlans[exerciseId].sets.push({
-          weight: "",
-          reps: "",
-          restTime: 60, // 默认休息时间为60秒
-        });
-
-        saveTrainingPlans();
-      }
-
-      // 开始休息计时器
-      function startRestTimer(exerciseId, setIndex, restTime = 60) {
-        // 停止现有的计时器
-        stopRestTimer();
-
-        // 设置休息时间（秒）
-        restTimeLeft = restTime;
-
-        // 更新按钮状态
-        const restButtons = document.querySelectorAll(".rest-timer-btn");
-        restButtons.forEach((btn) => {
-          btn.disabled = true;
-          btn.classList.add("running");
-        });
-
-        // 显示计时器
-        const timerDisplay = document.getElementById(`timer-${exerciseId}`);
-        const timerText = document.getElementById(
-          `timer-display-${exerciseId}`
-        );
-
-        timerDisplay.classList.add("active");
-        timerText.textContent = restTimeLeft;
-
-        // 开始计时
-        restTimer = setInterval(function () {
-          restTimeLeft--;
-          timerText.textContent = restTimeLeft;
-
-          if (restTimeLeft <= 0) {
-            stopRestTimer();
-            alert("休息时间结束，开始下一组！");
-          }
-        }, 1000);
-      }
-
-      // 停止休息计时器
-      function stopRestTimer() {
-        if (restTimer) {
-          clearInterval(restTimer);
-          restTimer = null;
-        }
-
-        // 重置按钮状态
-        const restButtons = document.querySelectorAll(".rest-timer-btn");
-        restButtons.forEach((btn) => {
-          btn.disabled = false;
-          btn.classList.remove("running");
-        });
-
-        // 隐藏计时器
-        const timerDisplays = document.querySelectorAll(".rest-timer-display");
-        timerDisplays.forEach((display) => {
-          display.classList.remove("active");
-        });
-      }
-
       // 初始化添加动作选择框
       function initAddExerciseSelect() {
         const select = document.getElementById("add-exercise-select");
@@ -1826,33 +1560,6 @@
           option.textContent = exercise.name;
           select.appendChild(option);
         });
-      }
-
-      // 添加动作到计划
-      function addExerciseToPlan(dateStr, exerciseId) {
-        if (!trainingPlans[dateStr]) {
-          trainingPlans[dateStr] = [];
-        }
-
-        if (!trainingPlans[dateStr].includes(exerciseId)) {
-          trainingPlans[dateStr].push(exerciseId);
-          saveTrainingPlans();
-        }
-      }
-
-      // 从计划中移除动作
-      function removeExerciseFromPlan(dateStr, exerciseId) {
-        if (trainingPlans[dateStr]) {
-          trainingPlans[dateStr] = trainingPlans[dateStr].filter(
-            (id) => id !== exerciseId
-          );
-
-          if (trainingPlans[dateStr].length === 0) {
-            delete trainingPlans[dateStr];
-          }
-
-          saveTrainingPlans();
-        }
       }
 
       // 保存训练计划到本地存储
