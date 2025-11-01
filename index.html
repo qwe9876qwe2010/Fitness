@@ -1,2227 +1,2207 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>训练计划</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      }
-
-      body {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        color: #333;
-        line-height: 1.6;
-        padding: 20px;
-        min-height: 100vh;
-      }
-
-      header {
-        text-align: center;
-        margin-bottom: 30px;
-        padding: 25px;
-        background: linear-gradient(135deg, #4a90e2 0%, #2a6dc7 100%);
-        border-radius: 10px;
-        max-width: 1800px;
-        margin-left: auto;
-        margin-right: auto;
-        color: white;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      }
-
-      header h1 {
-        font-size: 2.2rem;
-        margin-bottom: 10px;
-      }
-
-      .container {
-        display: flex;
-        max-width: 1800px;
-        margin: 0 auto;
-        gap: 20px;
-      }
-
-      .exercises-section {
-        flex: 1;
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      }
-
-      .calendar-section {
-        flex: 1;
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      }
-
-      /* 动作详情弹窗样式 */
-      .exercise-detail-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 1000;
-        overflow-y: auto;
-        padding: 20px;
-      }
-
-      .exercise-detail-content {
-        background: white;
-        max-width: 800px;
-        margin: 20px auto;
-        padding: 30px;
-        border-radius: 15px;
-        position: relative;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      }
-
-      .exercise-detail-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 20px;
-      }
-
-      .exercise-detail-title {
-        font-size: 24px;
-        color: #333;
-        margin: 0;
-      }
-
-      .exercise-detail-bodypart {
-        font-size: 18px;
-        color: #666;
-        margin: 5px 0 15px 0;
-      }
-
-      .exercise-detail-type {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 15px;
-        font-size: 12px;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 15px;
-      }
-
-      .exercise-detail-type.warmup {
-        background: #fff3cd;
-        color: #856404;
-      }
-
-      .exercise-detail-type.stretch {
-        background: #d1ecf1;
-        color: #0c5460;
-      }
-
-      .exercise-detail-type.training {
-        background: #d4edda;
-        color: #155724;
-      }
-
-      .exercise-detail-description {
-        font-size: 16px;
-        line-height: 1.6;
-        color: #555;
-        margin-bottom: 25px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #eee;
-      }
-
-      .exercise-detail-section {
-        margin-bottom: 25px;
-      }
-
-      .exercise-detail-section h3 {
-        font-size: 18px;
-        color: #333;
-        margin-bottom: 15px;
-        padding-bottom: 8px;
-      }
-
-      .exercise-detail-muscles {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 20px;
-      }
-
-      .muscle-tag {
-        background: #e9ecef;
-        color: #495057;
-        padding: 8px 15px;
-        border-radius: 20px;
-        font-size: 14px;
-        cursor: default;
-      }
-
-      .exercise-detail-steps {
-        list-style-type: none;
-        padding: 0;
-      }
-
-      .exercise-detail-steps li {
-        padding: 12px 0;
-        border-bottom: 1px solid #f0f0f0;
-        counter-increment: step-counter;
-        position: relative;
-        padding-left: 40px;
-      }
-
-      .exercise-detail-steps li:before {
-        content: counter(step-counter);
-        background: #4a90e2;
-        color: white;
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 12px;
-        font-weight: bold;
-      }
-
-      .exercise-detail-tips {
-        list-style-type: none;
-        padding: 0;
-      }
-
-      .exercise-detail-tips li {
-        padding: 10px 0;
-        border-bottom: 1px solid #f0f0f0;
-        padding-left: 30px;
-        position: relative;
-      }
-
-      .exercise-detail-tips li:before {
-        content: "💡";
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-      }
-
-      .exercise-detail-gif {
-        text-align: center;
-        margin: 20px 0;
-      }
-
-      .exercise-detail-gif img {
-        max-width: 100%;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      }
-
-      .exercise-detail-actions {
-        display: flex;
-        gap: 15px;
-        margin-top: 25px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-      }
-
-      @media (max-width: 768px) {
-        .exercise-detail-actions {
-          flex-direction: column;
+        /* 样式代码保持不变 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
-      }
 
-      /* 筛选区域样式 */
-      .filters {
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 15px;
-        padding: 15px;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-      }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #4a90e2 0%, #2a6dc7 100%);
+            border-radius: 10px;
+            max-width: 1800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
 
-      .search-box {
-        flex: 1;
-        min-width: 250px;
-      }
-
-      .search-box input {
-        width: 100%;
-        padding: 12px 20px;
-        border: 1px solid #ddd;
-        border-radius: 25px;
-        font-size: 16px;
-        outline: none;
-        transition: border-color 0.3s, box-shadow 0.3s;
-      }
-
-      .search-box input:focus {
-        border-color: #4a90e2;
-        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
-      }
-
-      .bodypart-filters {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-
-      .bodypart-btn {
-        padding: 10px 18px;
-        background: #f5f5f5;
-        border: 1px solid #ddd;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: all 0.3s;
-        font-size: 14px;
-        font-weight: 500;
-      }
-
-      .bodypart-btn:hover {
-        background: #e9e9e9;
-        transform: translateY(-2px);
-      }
-
-      .bodypart-btn.active {
-        background: #4a90e2;
-        color: white;
-        border-color: #4a90e2;
-        box-shadow: 0 2px 5px rgba(74, 144, 226, 0.3);
-      }
-
-      .exercise-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-        max-height: 70vh;
-        overflow-y: auto;
-        padding: 10px;
-      }
-
-      .exercise-item {
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        transition: transform 0.3s, box-shadow 0.3s;
-        cursor: grab;
-        position: relative;
-        overflow: hidden;
-        padding-top: 45px;
-        border: 2px solid transparent;
-      }
-
-      .exercise-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-      }
-
-      .exercise-item:active {
-        cursor: grabbing;
-      }
-
-      .exercise-item.dragging {
-        opacity: 0.5;
-        border: 2px dashed #4a90e2;
-      }
-
-      /* 动作类型标签 */
-      .exercise-type {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        padding: 6px 12px;
-        border-radius: 15px;
-        font-size: 11px;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        z-index: 2;
-      }
-
-      .exercise-type.warmup {
-        background: #fff3cd;
-        color: #856404;
-      }
-
-      .exercise-type.stretch {
-        background: #d1ecf1;
-        color: #0c5460;
-      }
-
-      .exercise-type.training {
-        background: #d4edda;
-        color: #155724;
-      }
-
-      .exercise-item h3 {
-        margin: 0 0 10px 0;
-        font-size: 18px;
-        color: #333;
-        line-height: 1.3;
-      }
-
-      .exercise-item p {
-        margin: 0 0 12px 0;
-        color: #666;
-        font-size: 14px;
-      }
-
-      .muscle-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 10px;
-      }
-
-      .muscle-tag {
-        background: #e9ecef;
-        color: #495057;
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        cursor: default;
-        transition: all 0.3s;
-      }
-
-      .muscle-tag:hover {
-        background: #e9ecef;
-        color: #495057;
-        transform: none;
-      }
-
-      .no-results {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: 50px;
-        background: white;
-        border-radius: 10px;
-        color: #666;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      }
-
-      /* 日历样式 */
-      .calendar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-      }
-
-      .calendar-header h2 {
-        color: #333;
-        font-size: 22px;
-      }
-
-      .calendar-nav {
-        display: flex;
-        gap: 10px;
-      }
-
-      .calendar-nav button {
-        padding: 8px 15px;
-        background: #4a90e2;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.3s;
-      }
-
-      .calendar-nav button:hover {
-        background: #2a6dc7;
-        transform: translateY(-2px);
-      }
-
-      .calendar-weekdays {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        text-align: center;
-        font-weight: bold;
-        margin-bottom: 10px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 10px;
-        color: #555;
-      }
-
-      .calendar-days {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 8px;
-      }
-
-      .calendar-day {
-        min-height: 110px;
-        border: 1px solid #eee;
-        padding: 10px;
-        border-radius: 8px;
-        background: #f9f9f9;
-        transition: background 0.3s;
-      }
-
-      .calendar-day.empty {
-        background: #f5f5f5;
-      }
-
-      .calendar-day.current-month {
-        background: white;
-      }
-
-      .calendar-day.today {
-        background: #fff9e6;
-        border-color: #ffcc00;
-      }
-
-      .calendar-day.drop-zone {
-        background: #e6f7ff;
-        border: 2px dashed #4a90e2;
-      }
-
-      .day-number {
-        font-weight: bold;
-        margin-bottom: 8px;
-        font-size: 16px;
-      }
-
-      .day-exercises {
-        font-size: 12px;
-        color: #666;
-      }
-
-      .exercise-badge {
-        display: inline-block;
-        background: #4a90e2;
-        color: white;
-        padding: 3px 8px;
-        border-radius: 12px;
-        margin: 2px;
-        font-size: 10px;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        cursor: pointer;
-      }
-
-      /* 热身和拉伸动作的徽章样式 */
-      .exercise-badge.warmup {
-        background: #ffc107;
-      }
-
-      .exercise-badge.stretch {
-        background: #17a2b8;
-      }
-
-      /* 训练计划详情 */
-      .plan-detail {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 1000;
-        overflow-y: auto;
-        padding: 20px;
-      }
-
-      .plan-content {
-        background: white;
-        max-width: 800px;
-        margin: 20px auto;
-        padding: 30px;
-        border-radius: 15px;
-        position: relative;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      }
-
-      .close-btn {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        font-size: 28px;
-        cursor: pointer;
-        background: none;
-        border: none;
-        color: #666;
-        z-index: 1001;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s;
-      }
-
-      .close-btn:hover {
-        background: #f5f5f5;
-        color: #333;
-      }
-
-      .plan-exercises {
-        margin-top: 20px;
-      }
-
-      .plan-exercise-item {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-left: 4px solid #4a90e2;
-      }
-
-      .exercise-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-      }
-
-      .remove-exercise {
-        background: #ff4d4d;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 8px 15px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.3s;
-      }
-
-      .remove-exercise:hover {
-        background: #e60000;
-        transform: translateY(-2px);
-      }
-
-      .sets-container {
-        margin-top: 15px;
-      }
-
-      .set-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 12px;
-        padding: 12px;
-        background: white;
-        border-radius: 8px;
-        flex-wrap: wrap;
-        border: 1px solid #e9ecef;
-      }
-
-      .set-number {
-        font-weight: bold;
-        min-width: 40px;
-        color: #555;
-      }
-
-      .set-input {
-        width: 90px;
-        padding: 8px 12px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        transition: border-color 0.3s;
-      }
-
-      .set-input:focus {
-        border-color: #4a90e2;
-        outline: none;
-      }
-
-      .input-with-unit {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-
-      .unit-label {
-        font-size: 13px;
-        color: #666;
-        white-space: nowrap;
-      }
-
-      .set-complete {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-
-      .complete-checkbox {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-      }
-
-      .complete-label {
-        font-size: 13px;
-        color: #666;
-      }
-
-      .add-set-btn {
-        background: #4a90e2;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 8px 15px;
-        cursor: pointer;
-        margin-top: 8px;
-        font-weight: 500;
-        transition: all 0.3s;
-      }
-
-      .add-set-btn:hover {
-        background: #2a6dc7;
-        transform: translateY(-2px);
-      }
-
-      .delete-set-btn {
-        background: #ff4d4d;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 6px 10px;
-        cursor: pointer;
-        font-size: 12px;
-        transition: all 0.3s;
-      }
-
-      .delete-set-btn:hover {
-        background: #e60000;
-      }
-
-      .add-exercise-select {
-        width: 100%;
-        padding: 12px 15px;
-        margin-top: 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 16px;
-        transition: border-color 0.3s;
-      }
-
-      .add-exercise-select:focus {
-        border-color: #4a90e2;
-        outline: none;
-      }
-
-      #add-exercise-btn {
-        margin-top: 15px;
-        padding: 12px 20px;
-        background: #4a90e2;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 500;
-        transition: all 0.3s;
-        width: 100%;
-      }
-
-      #add-exercise-btn:hover {
-        background: #2a6dc7;
-        transform: translateY(-2px);
-      }
-
-      /* 计时器弹窗样式 */
-      .timer-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        z-index: 2000;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .timer-content {
-        background: white;
-        border-radius: 15px;
-        padding: 30px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        max-width: 400px;
-        width: 90%;
-        overflow: hidden;
-      }
-
-      .timer-display {
-        font-size: 64px;
-        font-weight: bold;
-        color: #4a90e2;
-        margin: 20px 0;
-        font-family: "Courier New", monospace;
-      }
-
-      .timer-controls {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin-top: 20px;
-        flex-wrap: wrap;
-      }
-
-      .timer-btn {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.3s;
-        min-width: 100px;
-        box-sizing: border-box;
-      }
-
-      .timer-btn.secondary {
-        background: #6c757d;
-        color: white;
-      }
-
-      .timer-btn.secondary:hover {
-        background: #545b62;
-      }
-
-      .timer-btn.danger {
-        background: #dc3545;
-        color: white;
-      }
-
-      .timer-btn.danger:hover {
-        background: #c82333;
-      }
-
-      .timer-title {
-        font-size: 24px;
-        margin-bottom: 10px;
-        color: #333;
-      }
-
-      .timer-subtitle {
-        color: #666;
-        margin-bottom: 20px;
-      }
-
-      @media (max-width: 1200px) {
         .container {
-          flex-direction: column;
+            display: flex;
+            max-width: 1800px;
+            margin: 0 auto;
+            gap: 20px;
         }
 
-        .exercise-grid {
-          max-height: 50vh;
+        .exercises-section {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
-      }
 
-      @media (max-width: 768px) {
+        .calendar-section {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        /* 动作详情弹窗样式 */
+        .exercise-detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .exercise-detail-content {
+            background: white;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .exercise-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .exercise-detail-title {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+        }
+
+        .exercise-detail-bodypart {
+            font-size: 18px;
+            color: #666;
+            margin: 5px 0 15px 0;
+        }
+
+        .exercise-detail-type {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+
+        .exercise-detail-type.warmup {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .exercise-detail-type.stretch {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .exercise-detail-type.training {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .exercise-detail-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .exercise-detail-section {
+            margin-bottom: 25px;
+        }
+
+        .exercise-detail-section h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+        }
+
+        .exercise-detail-muscles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .muscle-tag {
+            background: #e9ecef;
+            color: #495057;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: default;
+        }
+
+        .exercise-detail-steps {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .exercise-detail-steps li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .exercise-detail-steps li:before {
+            content: counter(step-counter);
+            background: #4a90e2;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .exercise-detail-tips {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .exercise-detail-tips li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .exercise-detail-tips li:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .exercise-detail-gif {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .exercise-detail-gif img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .exercise-detail-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+            .exercise-detail-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* 筛选区域样式 */
         .filters {
-          flex-direction: column;
-          align-items: stretch;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
         }
 
         .bodypart-filters {
-          justify-content: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .bodypart-btn {
+            padding: 10px 18px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .bodypart-btn:hover {
+            background: #e9e9e9;
+            transform: translateY(-2px);
+        }
+
+        .bodypart-btn.active {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+            box-shadow: 0 2px 5px rgba(74, 144, 226, 0.3);
+        }
+
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .exercise-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: grab;
+            position: relative;
+            overflow: hidden;
+            padding-top: 45px;
+            border: 2px solid transparent;
+        }
+
+        .exercise-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .exercise-item:active {
+            cursor: grabbing;
+        }
+
+        .exercise-item.dragging {
+            opacity: 0.5;
+            border: 2px dashed #4a90e2;
+        }
+
+        /* 动作类型标签 */
+        .exercise-type {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 2;
+        }
+
+        .exercise-type.warmup {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .exercise-type.stretch {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .exercise-type.training {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .exercise-item h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        .exercise-item p {
+            margin: 0 0 12px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .muscle-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .muscle-tag {
+            background: #e9ecef;
+            color: #495057;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: default;
+            transition: all 0.3s;
+        }
+
+        .muscle-tag:hover {
+            background: #e9ecef;
+            color: #495057;
+            transform: none;
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px;
+            background: white;
+            border-radius: 10px;
+            color: #666;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 日历样式 */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header h2 {
+            color: #333;
+            font-size: 22px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            padding: 8px 15px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .calendar-nav button:hover {
+            background: #2a6dc7;
+            transform: translateY(-2px);
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            color: #555;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
         }
 
         .calendar-day {
-          min-height: 90px;
-          font-size: 12px;
+            min-height: 110px;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f9f9f9;
+            transition: background 0.3s;
+        }
+
+        .calendar-day.empty {
+            background: #f5f5f5;
+        }
+
+        .calendar-day.current-month {
+            background: white;
+        }
+
+        .calendar-day.today {
+            background: #fff9e6;
+            border-color: #ffcc00;
+        }
+
+        .calendar-day.drop-zone {
+            background: #e6f7ff;
+            border: 2px dashed #4a90e2;
+        }
+
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .day-exercises {
+            font-size: 12px;
+            color: #666;
         }
 
         .exercise-badge {
-          font-size: 9px;
-          padding: 2px 6px;
+            display: inline-block;
+            background: #4a90e2;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin: 2px;
+            font-size: 10px;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        /* 热身和拉伸动作的徽章样式 */
+        .exercise-badge.warmup {
+            background: #ffc107;
+        }
+
+        .exercise-badge.stretch {
+            background: #17a2b8;
+        }
+
+        /* 训练计划详情 */
+        .plan-detail {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .plan-content {
+            background: white;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #666;
+            z-index: 1001;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .plan-exercises {
+            margin-top: 20px;
+        }
+
+        .plan-exercise-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .remove-exercise {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .remove-exercise:hover {
+            background: #e60000;
+            transform: translateY(-2px);
+        }
+
+        .sets-container {
+            margin-top: 15px;
         }
 
         .set-item {
-          flex-wrap: wrap;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            border: 1px solid #e9ecef;
+        }
+
+        .set-number {
+            font-weight: bold;
+            min-width: 40px;
+            color: #555;
+        }
+
+        .set-input {
+            width: 90px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+
+        .set-input:focus {
+            border-color: #4a90e2;
+            outline: none;
         }
 
         .input-with-unit {
-          flex-wrap: wrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .unit-label {
+            font-size: 13px;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .set-complete {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .complete-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .complete-label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .add-set-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-top: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .add-set-btn:hover {
+            background: #2a6dc7;
+            transform: translateY(-2px);
+        }
+
+        .delete-set-btn {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .delete-set-btn:hover {
+            background: #e60000;
+        }
+
+        .add-exercise-select {
+            width: 100%;
+            padding: 12px 15px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .add-exercise-select:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+
+        #add-exercise-btn {
+            margin-top: 15px;
+            padding: 12px 20px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        #add-exercise-btn:hover {
+            background: #2a6dc7;
+            transform: translateY(-2px);
+        }
+
+        /* 计时器弹窗样式 */
+        .timer-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .timer-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            overflow: hidden;
         }
 
         .timer-display {
-          font-size: 48px;
+            font-size: 64px;
+            font-weight: bold;
+            color: #4a90e2;
+            margin: 20px 0;
+            font-family: "Courier New", monospace;
         }
 
         .timer-controls {
-          flex-direction: column;
-          gap: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
         }
 
         .timer-btn {
-          width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 100px;
+            box-sizing: border-box;
         }
-      }
-    </style>
-  </head>
 
-  <body>
+        .timer-btn.secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .timer-btn.secondary:hover {
+            background: #545b62;
+        }
+
+        .timer-btn.danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .timer-btn.danger:hover {
+            background: #c82333;
+        }
+
+        .timer-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .timer-subtitle {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .exercise-grid {
+                max-height: 50vh;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .bodypart-filters {
+                justify-content: center;
+            }
+
+            .calendar-day {
+                min-height: 90px;
+                font-size: 12px;
+            }
+
+            .exercise-badge {
+                font-size: 9px;
+                padding: 2px 6px;
+            }
+
+            .set-item {
+                flex-wrap: wrap;
+            }
+
+            .input-with-unit {
+                flex-wrap: wrap;
+            }
+
+            .timer-display {
+                font-size: 48px;
+            }
+
+            .timer-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .timer-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
     <header>
-      <h1>训练计划</h1>
+        <h1>训练计划</h1>
     </header>
 
     <div class="container">
-      <!-- 动作库区域 -->
-      <div class="exercises-section">
-        <h2>动作库</h2>
+        <!-- 动作库区域 -->
+        <div class="exercises-section">
+            <h2>动作库</h2>
 
-        <!-- 搜索和筛选区域 -->
-        <div class="filters">
-          <div class="search-box">
-            <input
-              type="text"
-              id="searchInput"
-              placeholder="搜索动作名称或肌肉名称..."
-            />
-          </div>
-          <div class="bodypart-filters">
-            <button class="bodypart-btn active" data-bodypart="all">
-              全部
-            </button>
-            <button class="bodypart-btn" data-bodypart="胸部">胸部</button>
-            <button class="bodypart-btn" data-bodypart="背部">背部</button>
-            <button class="bodypart-btn" data-bodypart="腿部">腿部</button>
-            <button class="bodypart-btn" data-bodypart="肩部">肩部</button>
-            <button class="bodypart-btn" data-bodypart="手臂">手臂</button>
-          </div>
-        </div>
-
-        <div class="exercise-grid" id="exerciseGrid">
-          <!-- 动作卡片将通过JavaScript动态生成 -->
-        </div>
-      </div>
-
-      <!-- 日历区域 -->
-      <div class="calendar-section">
-        <h2>训练计划</h2>
-
-        <div class="calendar-container">
-          <div class="calendar-header">
-            <h2 id="calendar-month">2023年10月</h2>
-            <div class="calendar-nav">
-              <button id="prev-month">上个月</button>
-              <button id="next-month">下个月</button>
+            <!-- 搜索和筛选区域 -->
+            <div class="filters">
+                <div class="search-box">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="搜索动作名称或肌肉名称..."
+                    />
+                </div>
+                <div class="bodypart-filters">
+                    <button class="bodypart-btn active" data-bodypart="all">
+                        全部
+                    </button>
+                    <button class="bodypart-btn" data-bodypart="胸部">胸部</button>
+                    <button class="bodypart-btn" data-bodypart="背部">背部</button>
+                    <button class="bodypart-btn" data-bodypart="腿部">腿部</button>
+                    <button class="bodypart-btn" data-bodypart="肩部">肩部</button>
+                    <button class="bodypart-btn" data-bodypart="手臂">手臂</button>
+                </div>
             </div>
-          </div>
-          <div class="calendar-weekdays">
-            <div>日</div>
-            <div>一</div>
-            <div>二</div>
-            <div>三</div>
-            <div>四</div>
-            <div>五</div>
-            <div>六</div>
-          </div>
-          <div class="calendar-days" id="calendar-days">
-            <!-- 日历天数将通过JavaScript动态生成 -->
-          </div>
+
+            <div class="exercise-grid" id="exerciseGrid">
+                <!-- 动作卡片将通过JavaScript动态生成 -->
+            </div>
         </div>
-      </div>
+
+        <!-- 日历区域 -->
+        <div class="calendar-section">
+            <h2>训练计划</h2>
+
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <h2 id="calendar-month">2023年10月</h2>
+                    <div class="calendar-nav">
+                        <button id="prev-month">上个月</button>
+                        <button id="next-month">下个月</button>
+                    </div>
+                </div>
+                <div class="calendar-weekdays">
+                    <div>日</div>
+                    <div>一</div>
+                    <div>二</div>
+                    <div>三</div>
+                    <div>四</div>
+                    <div>五</div>
+                    <div>六</div>
+                </div>
+                <div class="calendar-days" id="calendar-days">
+                    <!-- 日历天数将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 训练计划详情 -->
     <div class="plan-detail" id="plan-detail">
-      <div class="plan-content">
-        <button class="close-btn">&times;</button>
-        <h2 id="plan-date">训练计划</h2>
-        <div class="plan-exercises" id="plan-exercises">
-          <!-- 计划中的动作将通过JavaScript动态生成 -->
+        <div class="plan-content">
+            <button class="close-btn">&times;</button>
+            <h2 id="plan-date">训练计划</h2>
+            <div class="plan-exercises" id="plan-exercises">
+                <!-- 计划中的动作将通过JavaScript动态生成 -->
+            </div>
+            <select class="add-exercise-select" id="add-exercise-select">
+                <option value="">选择要添加的动作...</option>
+                <!-- 动作选项将通过JavaScript动态生成 -->
+            </select>
+            <button id="add-exercise-btn">添加动作</button>
         </div>
-        <select class="add-exercise-select" id="add-exercise-select">
-          <option value="">选择要添加的动作...</option>
-          <!-- 动作选项将通过JavaScript动态生成 -->
-        </select>
-        <button id="add-exercise-btn">添加动作</button>
-      </div>
     </div>
 
     <!-- 计时器弹窗 -->
     <div class="timer-modal" id="timer-modal">
-      <div class="timer-content">
-        <h2 class="timer-title">休息计时器</h2>
-        <p class="timer-subtitle">完成一组动作后，建议休息一段时间</p>
-        <div class="timer-display" id="timer-display">01:00</div>
-        <div class="timer-controls">
-          <button class="timer-btn secondary" id="add-10s">+10秒</button>
-          <button class="timer-btn secondary" id="subtract-10s">-10秒</button>
-          <button class="timer-btn danger" id="skip-timer">跳过</button>
+        <div class="timer-content">
+            <h2 class="timer-title">休息计时器</h2>
+            <p class="timer-subtitle">完成一组动作后，建议休息一段时间</p>
+            <div class="timer-display" id="timer-display">01:00</div>
+            <div class="timer-controls">
+                <button class="timer-btn secondary" id="add-10s">+10秒</button>
+                <button class="timer-btn secondary" id="subtract-10s">-10秒</button>
+                <button class="timer-btn danger" id="skip-timer">跳过</button>
+            </div>
         </div>
-      </div>
     </div>
 
     <div class="exercise-detail-modal" id="exercise-detail-modal">
-      <div class="exercise-detail-content">
-        <button class="close-btn">&times;</button>
-        <div class="exercise-detail-header">
-          <div>
-            <h2 class="exercise-detail-title" id="exercise-detail-title">
-              动作名称
-            </h2>
-            <p class="exercise-detail-bodypart" id="exercise-detail-bodypart">
-              部位
+        <div class="exercise-detail-content">
+            <button class="close-btn exercise-close-btn">&times;</button>
+            <div class="exercise-detail-header">
+                <div>
+                    <h2 class="exercise-detail-title" id="exercise-detail-title">
+                        动作名称
+                    </h2>
+                    <p class="exercise-detail-bodypart" id="exercise-detail-bodypart">
+                        部位
+                    </p>
+                    <span class="exercise-detail-type" id="exercise-detail-type"
+                        >类型</span
+                    >
+                </div>
+            </div>
+
+            <p class="exercise-detail-description" id="exercise-detail-description">
+                动作描述
             </p>
-            <span class="exercise-detail-type" id="exercise-detail-type"
-              >类型</span
-            >
-          </div>
-        </div>
 
-        <p class="exercise-detail-description" id="exercise-detail-description">
-          动作描述
-        </p>
+            <div class="exercise-detail-section">
+                <h3>目标肌肉</h3>
+                <div class="exercise-detail-muscles" id="exercise-detail-muscles">
+                    <!-- 肌肉标签将通过JavaScript动态生成 -->
+                </div>
+            </div>
 
-        <div class="exercise-detail-section">
-          <h3>目标肌肉</h3>
-          <div class="exercise-detail-muscles" id="exercise-detail-muscles">
-            <!-- 肌肉标签将通过JavaScript动态生成 -->
-          </div>
-        </div>
+            <div class="exercise-detail-section">
+                <h3>执行步骤</h3>
+                <ol class="exercise-detail-steps" id="exercise-detail-steps">
+                    <!-- 步骤将通过JavaScript动态生成 -->
+                </ol>
+            </div>
 
-        <div class="exercise-detail-section">
-          <h3>执行步骤</h3>
-          <ol class="exercise-detail-steps" id="exercise-detail-steps">
-            <!-- 步骤将通过JavaScript动态生成 -->
-          </ol>
-        </div>
+            <div class="exercise-detail-section">
+                <h3>训练技巧</h3>
+                <ul class="exercise-detail-tips" id="exercise-detail-tips">
+                    <!-- 技巧将通过JavaScript动态生成 -->
+                </ul>
+            </div>
 
-        <div class="exercise-detail-section">
-          <h3>训练技巧</h3>
-          <ul class="exercise-detail-tips" id="exercise-detail-tips">
-            <!-- 技巧将通过JavaScript动态生成 -->
-          </ul>
+            <div class="exercise-detail-gif" id="exercise-detail-gif">
+                <!-- GIF图片将通过JavaScript动态生成 -->
+            </div>
         </div>
-
-        <div class="exercise-detail-gif" id="exercise-detail-gif">
-          <!-- GIF图片将通过JavaScript动态生成 -->
-        </div>
-      </div>
     </div>
 
     <script>
-      // 动作数据
-      const exercises = [
-        // 热身动作
-        {
-          id: "band-warmup",
-          name: "弹力带肩部热身",
-          bodyPart: "肩部",
-          type: "warmup",
-          description:
-            "弹力带肩部热身是训练前的重要准备动作，可以有效激活肩部肌群，增加肩关节活动度，预防肩部损伤。",
-          muscles: ["三角肌前束", "三角肌中束", "三角肌后束"],
-          gif: "gifs/band-warmup.gif",
-          steps: [
-            "双脚与肩同宽站立，双手握住弹力带两端",
-            "手臂伸直，将弹力带举至胸前高度",
-            "慢慢将双臂向上抬起，保持手臂伸直",
-            "继续向上向后移动，直到弹力带越过头部",
-            "缓慢回到起始位置",
-            "重复10-15次，进行2-3组",
-          ],
-          tips: [
-            "动作要缓慢控制，感受肩部的拉伸感",
-            "保持核心收紧，避免腰部过度反弓",
-            "如果肩部柔韧性较差，可以适当加宽弹力带握距",
-            "热身时不要使用过大的阻力",
-          ],
-        },
-        {
-          id: "money-cat",
-          name: "招财猫肩部热身",
-          bodyPart: "肩部",
-          type: "warmup",
-          description:
-            "招财猫动作是经典的肩部热身动作，使用轻重量哑铃进行，可以有效激活肩部旋转肌群，预防肩部损伤。",
-          muscles: ["三角肌前束", "三角肌中束", "肩袖肌群"],
-          steps: [
-            "双手各握一个2.5kg哑铃，站立或坐立",
-            "双臂向两侧抬起，肘关节弯曲90度，前臂与地面垂直",
-            "保持上臂不动，旋转肩关节，将哑铃向前向下转动",
-            "到达最低点后，再向上向后旋转回到起始位置",
-            "重复10-15次，进行2-3组",
-          ],
-          tips: [
-            "使用轻重量，重点是动作的控制和肩部的感受",
-            "保持上臂与地面平行，不要上下晃动",
-            "动作要缓慢，感受肩部旋转肌群的激活",
-            "如果肩部有不适，减小动作幅度或使用更轻的重量",
-          ],
-        },
-        {
-          id: "dynamic-stretch",
-          name: "动态拉伸热身",
-          bodyPart: "全身",
-          type: "warmup",
-          description:
-            "动态拉伸是训练前的重要热身环节，通过活动关节和肌肉，增加身体温度和血液循环，为训练做好准备。",
-          muscles: ["全身主要肌群"],
-          steps: [
-            "颈部旋转：缓慢转动颈部，顺时针和逆时针各5次",
-            "肩部环绕：向前向后各转动肩部10次",
-            "手臂摆动：前后摆动双臂，活动肩关节",
-            "体转运动：左右转动躯干，活动脊柱",
-            "高抬腿：每侧10次，活动髋关节和腿部",
-            "开合跳：20次，提升心率和体温",
-          ],
-          tips: [
-            "动态拉伸不同于静态拉伸，要保持动作的连续性",
-            "每个动作要做到位，但不要过度拉伸",
-            "根据当天的训练内容，可以增加针对性的热身动作",
-            "整个热身过程持续5-10分钟为宜",
-          ],
-        },
+        // 动作数据
+        const exercises = [
+            // 热身动作
+            {
+                id: "band-warmup",
+                name: "弹力带肩部热身",
+                bodyPart: "肩部",
+                type: "warmup",
+                description:
+                    "弹力带肩部热身是训练前的重要准备动作，可以有效激活肩部肌群，增加肩关节活动度，预防肩部损伤。",
+                muscles: ["三角肌前束", "三角肌中束", "三角肌后束"],
+                gif: "gifs/band-warmup.gif",
+                steps: [
+                    "双脚与肩同宽站立，双手握住弹力带两端",
+                    "手臂伸直，将弹力带举至胸前高度",
+                    "慢慢将双臂向上抬起，保持手臂伸直",
+                    "继续向上向后移动，直到弹力带越过头部",
+                    "缓慢回到起始位置",
+                    "重复10-15次，进行2-3组",
+                ],
+                tips: [
+                    "动作要缓慢控制，感受肩部的拉伸感",
+                    "保持核心收紧，避免腰部过度反弓",
+                    "如果肩部柔韧性较差，可以适当加宽弹力带握距",
+                    "热身时不要使用过大的阻力",
+                ],
+            },
+            {
+                id: "money-cat",
+                name: "招财猫肩部热身",
+                bodyPart: "肩部",
+                type: "warmup",
+                description:
+                    "招财猫动作是经典的肩部热身动作，使用轻重量哑铃进行，可以有效激活肩部旋转肌群，预防肩部损伤。",
+                muscles: ["三角肌前束", "三角肌中束", "肩袖肌群"],
+                steps: [
+                    "双手各握一个2.5kg哑铃，站立或坐立",
+                    "双臂向两侧抬起，肘关节弯曲90度，前臂与地面垂直",
+                    "保持上臂不动，旋转肩关节，将哑铃向前向下转动",
+                    "到达最低点后，再向上向后旋转回到起始位置",
+                    "重复10-15次，进行2-3组",
+                ],
+                tips: [
+                    "使用轻重量，重点是动作的控制和肩部的感受",
+                    "保持上臂与地面平行，不要上下晃动",
+                    "动作要缓慢，感受肩部旋转肌群的激活",
+                    "如果肩部有不适，减小动作幅度或使用更轻的重量",
+                ],
+            },
+            {
+                id: "dynamic-stretch",
+                name: "动态拉伸热身",
+                bodyPart: "全身",
+                type: "warmup",
+                description:
+                    "动态拉伸是训练前的重要热身环节，通过活动关节和肌肉，增加身体温度和血液循环，为训练做好准备。",
+                muscles: ["全身主要肌群"],
+                steps: [
+                    "颈部旋转：缓慢转动颈部，顺时针和逆时针各5次",
+                    "肩部环绕：向前向后各转动肩部10次",
+                    "手臂摆动：前后摆动双臂，活动肩关节",
+                    "体转运动：左右转动躯干，活动脊柱",
+                    "高抬腿：每侧10次，活动髋关节和腿部",
+                    "开合跳：20次，提升心率和体温",
+                ],
+                tips: [
+                    "动态拉伸不同于静态拉伸，要保持动作的连续性",
+                    "每个动作要做到位，但不要过度拉伸",
+                    "根据当天的训练内容，可以增加针对性的热身动作",
+                    "整个热身过程持续5-10分钟为宜",
+                ],
+            },
 
-        // 训练动作
-        {
-          id: "bench-press",
-          name: "平板卧推",
-          bodyPart: "胸部",
-          type: "training",
-          description:
-            "平板卧推是胸部训练的基础动作，主要锻炼胸大肌，同时也能锻炼到肩部和手臂肌肉。这是增加胸部力量和体积最有效的动作之一。",
-          muscles: ["胸大肌", "三角肌前束", "肱三头肌"],
-          steps: [
-            "平躺在卧推凳上，双脚稳固地踩在地面上",
-            "双手握住杠铃，比肩略宽，掌心向前",
-            "从架上取下杠铃，伸直手臂，使杠铃位于胸部正上方",
-            "缓慢下降杠铃至胸部，保持肘部与身体呈约45度角",
-            "当杠铃轻触胸部后，用力推起杠铃至起始位置",
-            "重复动作至完成目标次数",
-          ],
-          gif: "gifs/bench-press.gif",
-          tips: [
-            "保持肩胛骨收紧，背部轻微弓起",
-            "下降时控制速度，避免快速下降",
-            "推起时呼气，下降时吸气",
-            "初学者建议使用较轻重量，先掌握正确姿势",
-          ],
-        },
-        {
-          id: "incline-press",
-          name: "上斜卧推",
-          bodyPart: "胸部",
-          type: "training",
-          description:
-            "上斜卧推主要针对上胸部肌肉，有助于塑造饱满的上胸线条。使用倾斜的卧推凳完成，角度通常设置在30-45度。",
-          muscles: ["上胸大肌", "三角肌前束", "肱三头肌"],
-          steps: [
-            "调整卧推凳至30-45度倾斜角度",
-            "平躺在凳上，双脚稳固踩地",
-            "双手握住杠铃，比肩略宽",
-            "从架上取下杠铃，伸直手臂",
-            "缓慢下降杠铃至上胸部位置",
-            "用力推起杠铃至起始位置",
-          ],
-          tips: [
-            "确保卧推凳角度合适，不要过陡",
-            "注意力集中在上胸部肌肉的收缩",
-            "下降时控制速度，感受上胸部的拉伸",
-          ],
-        },
-        {
-          id: "bent-over-row",
-          name: "俯身划船",
-          bodyPart: "背部",
-          type: "training",
-          description:
-            "俯身划船是背部训练的经典动作，主要锻炼背阔肌和菱形肌，同时也能增强核心稳定性。",
-          muscles: ["背阔肌", "菱形肌", "肱二头肌", "竖脊肌"],
-          steps: [
-            "双脚与肩同宽站立，膝盖微弯",
-            "上半身前倾至约45度，保持背部挺直",
-            "双手正握杠铃，略宽于肩",
-            "将杠铃向上拉向腹部，肘部靠近身体",
-            "在顶峰位置稍作停留，感受背部肌肉收缩",
-            "缓慢放下杠铃至起始位置",
-          ],
-          tips: [
-            "保持背部挺直，避免圆背",
-            "动作过程中核心收紧，保持身体稳定",
-            "使用背部肌肉发力，而不是手臂",
-          ],
-        },
-        {
-          id: "deadlift",
-          name: "硬拉",
-          bodyPart: "背部",
-          type: "training",
-          description:
-            "硬拉是全身复合动作之王，主要锻炼背部、臀部和腿部肌肉群，能有效提升全身力量和肌肉量。",
-          muscles: ["背阔肌", "竖脊肌", "臀大肌", "腘绳肌", "股四头肌"],
-          steps: [
-            "双脚与肩同宽站立，杠铃位于脚掌中央上方",
-            "弯腰屈膝，双手正握或正反握杠铃",
-            "保持背部挺直，胸部挺起，核心收紧",
-            "用腿部力量启动，将杠铃沿小腿向上拉",
-            "当杠铃过膝后，向前挺髋至完全站立",
-            "缓慢下放杠铃，保持控制，回到起始位置",
-          ],
-          tips: [
-            "始终保持背部挺直，避免圆背",
-            "动作过程中杠铃尽量贴近身体",
-            "使用腿部力量启动，而不是用背部硬拉",
-            "初学者建议从轻重量开始，注重动作形式",
-          ],
-        },
-        {
-          id: "squat",
-          name: "深蹲",
-          bodyPart: "腿部",
-          type: "training",
-          description:
-            "深蹲是下肢训练的基础动作，被称为'动作之王'，主要锻炼股四头肌、臀大肌和腘绳肌，同时也能增强核心力量。",
-          muscles: ["股四头肌", "臀大肌", "腘绳肌", "核心肌群"],
-          steps: [
-            "双脚与肩同宽或略宽站立，脚尖稍微外展",
-            "保持背部挺直，胸部挺起，核心收紧",
-            "缓慢下蹲，臀部向后坐，如同要坐在椅子上",
-            "下蹲至大腿与地面平行或更低",
-            "用脚跟发力，推动身体回到起始位置",
-            "全程保持膝盖与脚尖方向一致",
-          ],
-          tips: [
-            "保持背部挺直，避免圆背",
-            "膝盖不要超过脚尖太多",
-            "下蹲时吸气，上升时呼气",
-            "初学者可以先练习自重深蹲，再逐步增加负重",
-          ],
-        },
-        {
-          id: "leg-extension",
-          name: "腿屈伸",
-          bodyPart: "腿部",
-          type: "training",
-          description:
-            "腿屈伸是股四头肌的孤立训练动作，使用专用器械完成，能有效塑造大腿前侧肌肉线条。",
-          muscles: ["股四头肌"],
-          steps: [
-            "坐在腿屈伸器械上，背部紧贴靠背",
-            "将脚踝放在滚垫下方，调整器械使膝盖与转轴对齐",
-            "双手抓住侧边把手，稳定身体",
-            "用股四头肌发力，伸直双腿至最高点",
-            "在顶峰位置稍作停留，感受股四头肌收缩",
-            "缓慢下放重量至起始位置",
-          ],
-          tips: [
-            "避免使用过大重量，以免对膝关节造成压力",
-            "动作要控制，不要用爆发力",
-            "在顶峰位置充分收缩股四头肌",
-          ],
-        },
-        {
-          id: "dumbbell-press",
-          name: "哑铃推举",
-          bodyPart: "肩部",
-          type: "training",
-          description:
-            "哑铃推举是肩部训练的核心动作，主要锻炼三角肌，同时也能锻炼到肱三头肌和上胸部。",
-          muscles: ["三角肌前束", "肱三头肌", "上胸大肌"],
-          steps: [
-            "坐在凳上，背部挺直，双脚稳固踩地",
-            "双手各握一哑铃，举至肩部高度，掌心向前",
-            "核心收紧，用肩部力量将哑铃向上推举",
-            "在最高点稍作停留，感受肩部肌肉收缩",
-            "缓慢下放哑铃至肩部高度",
-            "重复动作至完成目标次数",
-          ],
-          tips: [
-            "保持背部挺直，避免过度弓背",
-            "动作过程中控制哑铃，避免摆动",
-            "下放时控制速度，感受肌肉拉伸",
-          ],
-        },
-        {
-          id: "lateral-raise",
-          name: "侧平举",
-          bodyPart: "肩部",
-          type: "training",
-          description:
-            "侧平举是针对三角肌中束的孤立训练动作，能有效增加肩部宽度，塑造'南瓜肩'。",
-          muscles: ["三角肌中束"],
-          steps: [
-            "站立或坐立，双手各握一哑铃，置于身体两侧",
-            "保持肘部微弯，用肩部力量将哑铃向两侧平举",
-            "举至手臂与地面平行或略高",
-            "在顶峰位置稍作停留，感受三角肌中束收缩",
-            "缓慢下放哑铃至起始位置",
-            "控制动作速度，避免使用惯性",
-          ],
-          tips: [
-            "使用较轻重量，注重动作质量和肌肉感受",
-            "避免耸肩，保持肩部下沉",
-            "想象在倒水，小拇指略高于大拇指",
-          ],
-        },
+            // 训练动作
+            {
+                id: "bench-press",
+                name: "平板卧推",
+                bodyPart: "胸部",
+                type: "training",
+                description:
+                    "平板卧推是胸部训练的基础动作，主要锻炼胸大肌，同时也能锻炼到肩部和手臂肌肉。这是增加胸部力量和体积最有效的动作之一。",
+                muscles: ["胸大肌", "三角肌前束", "肱三头肌"],
+                steps: [
+                    "平躺在卧推凳上，双脚稳固地踩在地面上",
+                    "双手握住杠铃，比肩略宽，掌心向前",
+                    "从架上取下杠铃，伸直手臂，使杠铃位于胸部正上方",
+                    "缓慢下降杠铃至胸部，保持肘部与身体呈约45度角",
+                    "当杠铃轻触胸部后，用力推起杠铃至起始位置",
+                    "重复动作至完成目标次数",
+                ],
+                gif: "gifs/bench-press.gif",
+                tips: [
+                    "保持肩胛骨收紧，背部轻微弓起",
+                    "下降时控制速度，避免快速下降",
+                    "推起时呼气，下降时吸气",
+                    "初学者建议使用较轻重量，先掌握正确姿势",
+                ],
+            },
+            {
+                id: "incline-press",
+                name: "上斜卧推",
+                bodyPart: "胸部",
+                type: "training",
+                description:
+                    "上斜卧推主要针对上胸部肌肉，有助于塑造饱满的上胸线条。使用倾斜的卧推凳完成，角度通常设置在30-45度。",
+                muscles: ["上胸大肌", "三角肌前束", "肱三头肌"],
+                steps: [
+                    "调整卧推凳至30-45度倾斜角度",
+                    "平躺在凳上，双脚稳固踩地",
+                    "双手握住杠铃，比肩略宽",
+                    "从架上取下杠铃，伸直手臂",
+                    "缓慢下降杠铃至上胸部位置",
+                    "用力推起杠铃至起始位置",
+                ],
+                tips: [
+                    "确保卧推凳角度合适，不要过陡",
+                    "注意力集中在上胸部肌肉的收缩",
+                    "下降时控制速度，感受上胸部的拉伸",
+                ],
+            },
+            {
+                id: "bent-over-row",
+                name: "俯身划船",
+                bodyPart: "背部",
+                type: "training",
+                description:
+                    "俯身划船是背部训练的经典动作，主要锻炼背阔肌和菱形肌，同时也能增强核心稳定性。",
+                muscles: ["背阔肌", "菱形肌", "肱二头肌", "竖脊肌"],
+                steps: [
+                    "双脚与肩同宽站立，膝盖微弯",
+                    "上半身前倾至约45度，保持背部挺直",
+                    "双手正握杠铃，略宽于肩",
+                    "将杠铃向上拉向腹部，肘部靠近身体",
+                    "在顶峰位置稍作停留，感受背部肌肉收缩",
+                    "缓慢放下杠铃至起始位置",
+                ],
+                tips: [
+                    "保持背部挺直，避免圆背",
+                    "动作过程中核心收紧，保持身体稳定",
+                    "使用背部肌肉发力，而不是手臂",
+                ],
+            },
+            {
+                id: "deadlift",
+                name: "硬拉",
+                bodyPart: "背部",
+                type: "training",
+                description:
+                    "硬拉是全身复合动作之王，主要锻炼背部、臀部和腿部肌肉群，能有效提升全身力量和肌肉量。",
+                muscles: ["背阔肌", "竖脊肌", "臀大肌", "腘绳肌", "股四头肌"],
+                steps: [
+                    "双脚与肩同宽站立，杠铃位于脚掌中央上方",
+                    "弯腰屈膝，双手正握或正反握杠铃",
+                    "保持背部挺直，胸部挺起，核心收紧",
+                    "用腿部力量启动，将杠铃沿小腿向上拉",
+                    "当杠铃过膝后，向前挺髋至完全站立",
+                    "缓慢下放杠铃，保持控制，回到起始位置",
+                ],
+                tips: [
+                    "始终保持背部挺直，避免圆背",
+                    "动作过程中杠铃尽量贴近身体",
+                    "使用腿部力量启动，而不是用背部硬拉",
+                    "初学者建议从轻重量开始，注重动作形式",
+                ],
+            },
+            {
+                id: "squat",
+                name: "深蹲",
+                bodyPart: "腿部",
+                type: "training",
+                description:
+                    "深蹲是下肢训练的基础动作，被称为'动作之王'，主要锻炼股四头肌、臀大肌和腘绳肌，同时也能增强核心力量。",
+                muscles: ["股四头肌", "臀大肌", "腘绳肌", "核心肌群"],
+                steps: [
+                    "双脚与肩同宽或略宽站立，脚尖稍微外展",
+                    "保持背部挺直，胸部挺起，核心收紧",
+                    "缓慢下蹲，臀部向后坐，如同要坐在椅子上",
+                    "下蹲至大腿与地面平行或更低",
+                    "用脚跟发力，推动身体回到起始位置",
+                    "全程保持膝盖与脚尖方向一致",
+                ],
+                tips: [
+                    "保持背部挺直，避免圆背",
+                    "膝盖不要超过脚尖太多",
+                    "下蹲时吸气，上升时呼气",
+                    "初学者可以先练习自重深蹲，再逐步增加负重",
+                ],
+            },
+            {
+                id: "leg-extension",
+                name: "腿屈伸",
+                bodyPart: "腿部",
+                type: "training",
+                description:
+                    "腿屈伸是股四头肌的孤立训练动作，使用专用器械完成，能有效塑造大腿前侧肌肉线条。",
+                muscles: ["股四头肌"],
+                steps: [
+                    "坐在腿屈伸器械上，背部紧贴靠背",
+                    "将脚踝放在滚垫下方，调整器械使膝盖与转轴对齐",
+                    "双手抓住侧边把手，稳定身体",
+                    "用股四头肌发力，伸直双腿至最高点",
+                    "在顶峰位置稍作停留，感受股四头肌收缩",
+                    "缓慢下放重量至起始位置",
+                ],
+                tips: [
+                    "避免使用过大重量，以免对膝关节造成压力",
+                    "动作要控制，不要用爆发力",
+                    "在顶峰位置充分收缩股四头肌",
+                ],
+            },
+            {
+                id: "dumbbell-press",
+                name: "哑铃推举",
+                bodyPart: "肩部",
+                type: "training",
+                description:
+                    "哑铃推举是肩部训练的核心动作，主要锻炼三角肌，同时也能锻炼到肱三头肌和上胸部。",
+                muscles: ["三角肌前束", "肱三头肌", "上胸大肌"],
+                steps: [
+                    "坐在凳上，背部挺直，双脚稳固踩地",
+                    "双手各握一哑铃，举至肩部高度，掌心向前",
+                    "核心收紧，用肩部力量将哑铃向上推举",
+                    "在最高点稍作停留，感受肩部肌肉收缩",
+                    "缓慢下放哑铃至肩部高度",
+                    "重复动作至完成目标次数",
+                ],
+                tips: [
+                    "保持背部挺直，避免过度弓背",
+                    "动作过程中控制哑铃，避免摆动",
+                    "下放时控制速度，感受肌肉拉伸",
+                ],
+            },
+            {
+                id: "lateral-raise",
+                name: "侧平举",
+                bodyPart: "肩部",
+                type: "training",
+                description:
+                    "侧平举是针对三角肌中束的孤立训练动作，能有效增加肩部宽度，塑造'南瓜肩'。",
+                muscles: ["三角肌中束"],
+                steps: [
+                    "站立或坐立，双手各握一哑铃，置于身体两侧",
+                    "保持肘部微弯，用肩部力量将哑铃向两侧平举",
+                    "举至手臂与地面平行或略高",
+                    "在顶峰位置稍作停留，感受三角肌中束收缩",
+                    "缓慢下放哑铃至起始位置",
+                    "控制动作速度，避免使用惯性",
+                ],
+                tips: [
+                    "使用较轻重量，注重动作质量和肌肉感受",
+                    "避免耸肩，保持肩部下沉",
+                    "想象在倒水，小拇指略高于大拇指",
+                ],
+            },
 
-        // 拉伸动作
-        {
-          id: "chest-stretch",
-          name: "胸部拉伸",
-          bodyPart: "胸部",
-          type: "stretch",
-          description:
-            "胸部拉伸是训练后的重要恢复动作，可以有效缓解胸部肌肉紧张，改善圆肩驼背姿势，增加胸椎活动度。",
-          muscles: ["胸大肌", "胸小肌", "三角肌前束"],
-          steps: [
-            "站在门框或墙角，手臂弯曲90度",
-            "前臂靠在门框上，肘部略高于肩部",
-            "缓慢向前迈一步，感受胸部的拉伸感",
-            "保持15-30秒，然后换另一侧",
-            "每侧重复2-3次",
-          ],
-          tips: [
-            "拉伸时保持正常呼吸，不要憋气",
-            "拉伸感应该是舒适的，如果感到疼痛则减小幅度",
-            "可以尝试不同高度的拉伸，针对胸部的不同部位",
-            "训练后立即进行拉伸效果最佳",
-          ],
-        },
-        {
-          id: "back-stretch",
-          name: "背部拉伸",
-          bodyPart: "背部",
-          type: "stretch",
-          description:
-            "背部拉伸有助于缓解背部肌肉紧张，改善姿势，预防腰背疼痛。特别适合在背部训练后进行。",
-          muscles: ["背阔肌", "菱形肌", "竖脊肌"],
-          steps: [
-            "跪姿，臀部坐在脚后跟上",
-            "向前俯身，双臂伸直向前伸展",
-            "将胸部贴近大腿，感受背部的拉伸",
-            "保持15-30秒，深呼吸",
-            "重复2-3次",
-          ],
-          tips: [
-            "如果膝盖不适，可以在膝盖下垫毛巾",
-            "拉伸时想象背部向两侧扩展",
-            "可以轻微左右移动，拉伸背部不同区域",
-            "配合深呼吸，呼气时尝试进一步放松和拉伸",
-          ],
-        },
-        {
-          id: "leg-stretch",
-          name: "腿部拉伸",
-          bodyPart: "腿部",
-          type: "stretch",
-          description:
-            "腿部拉伸有助于缓解腿部肌肉紧张，增加柔韧性，促进训练后恢复。特别适合在腿部训练后进行。",
-          muscles: ["股四头肌", "腘绳肌", "臀大肌", "小腿肌群"],
-          steps: [
-            "股四头肌拉伸：站立，将一脚跟拉向臀部，保持15-30秒",
-            "腘绳肌拉伸：坐姿，一腿伸直，一腿弯曲，向前俯身",
-            "小腿拉伸：站立，一腿在前一腿在后，后腿伸直踩地",
-            "每个拉伸保持15-30秒，每侧重复2-3次",
-          ],
-          tips: [
-            "拉伸时要保持平稳的呼吸",
-            "不要弹震式拉伸，保持静态持续拉伸",
-            "如果柔韧性较差，可以使用毛巾辅助",
-            "训练后肌肉温暖时进行拉伸效果更好",
-          ],
-        },
-        {
-          id: "shoulder-stretch",
-          name: "肩部拉伸",
-          bodyPart: "肩部",
-          type: "stretch",
-          description:
-            "肩部拉伸有助于缓解肩部肌肉紧张，改善肩关节活动度，预防肩部损伤。特别适合在肩部训练后进行。",
-          muscles: ["三角肌前束", "三角肌中束", "三角肌后束", "肩袖肌群"],
-          steps: [
-            "三角肌前束拉伸：将手臂横过胸前，用另一手轻轻加压",
-            "三角肌后束拉伸：将手臂横过胸前，肘部弯曲90度",
-            "肩部综合拉伸：双手在背后相扣，向上抬起",
-            "每个拉伸保持15-30秒，每侧重复2-3次",
-          ],
-          tips: [
-            "肩部是比较脆弱的关节，拉伸要轻柔",
-            "如果有关节疼痛，停止拉伸并咨询专业人士",
-            "可以结合呼吸，呼气时加深拉伸",
-            "定期进行肩部拉伸可以改善圆肩姿势",
-          ],
-        },
-      ];
+            // 拉伸动作
+            {
+                id: "chest-stretch",
+                name: "胸部拉伸",
+                bodyPart: "胸部",
+                type: "stretch",
+                description:
+                    "胸部拉伸是训练后的重要恢复动作，可以有效缓解胸部肌肉紧张，改善圆肩驼背姿势，增加胸椎活动度。",
+                muscles: ["胸大肌", "胸小肌", "三角肌前束"],
+                steps: [
+                    "站在门框或墙角，手臂弯曲90度",
+                    "前臂靠在门框上，肘部略高于肩部",
+                    "缓慢向前迈一步，感受胸部的拉伸感",
+                    "保持15-30秒，然后换另一侧",
+                    "每侧重复2-3次",
+                ],
+                tips: [
+                    "拉伸时保持正常呼吸，不要憋气",
+                    "拉伸感应该是舒适的，如果感到疼痛则减小幅度",
+                    "可以尝试不同高度的拉伸，针对胸部的不同部位",
+                    "训练后立即进行拉伸效果最佳",
+                ],
+            },
+            {
+                id: "back-stretch",
+                name: "背部拉伸",
+                bodyPart: "背部",
+                type: "stretch",
+                description:
+                    "背部拉伸有助于缓解背部肌肉紧张，改善姿势，预防腰背疼痛。特别适合在背部训练后进行。",
+                muscles: ["背阔肌", "菱形肌", "竖脊肌"],
+                steps: [
+                    "跪姿，臀部坐在脚后跟上",
+                    "向前俯身，双臂伸直向前伸展",
+                    "将胸部贴近大腿，感受背部的拉伸",
+                    "保持15-30秒，深呼吸",
+                    "重复2-3次",
+                ],
+                tips: [
+                    "如果膝盖不适，可以在膝盖下垫毛巾",
+                    "拉伸时想象背部向两侧扩展",
+                    "可以轻微左右移动，拉伸背部不同区域",
+                    "配合深呼吸，呼气时尝试进一步放松和拉伸",
+                ],
+            },
+            {
+                id: "leg-stretch",
+                name: "腿部拉伸",
+                bodyPart: "腿部",
+                type: "stretch",
+                description:
+                    "腿部拉伸有助于缓解腿部肌肉紧张，增加柔韧性，促进训练后恢复。特别适合在腿部训练后进行。",
+                muscles: ["股四头肌", "腘绳肌", "臀大肌", "小腿肌群"],
+                steps: [
+                    "股四头肌拉伸：站立，将一脚跟拉向臀部，保持15-30秒",
+                    "腘绳肌拉伸：坐姿，一腿伸直，一腿弯曲，向前俯身",
+                    "小腿拉伸：站立，一腿在前一腿在后，后腿伸直踩地",
+                    "每个拉伸保持15-30秒，每侧重复2-3次",
+                ],
+                tips: [
+                    "拉伸时要保持平稳的呼吸",
+                    "不要弹震式拉伸，保持静态持续拉伸",
+                    "如果柔韧性较差，可以使用毛巾辅助",
+                    "训练后肌肉温暖时进行拉伸效果更好",
+                ],
+            },
+            {
+                id: "shoulder-stretch",
+                name: "肩部拉伸",
+                bodyPart: "肩部",
+                type: "stretch",
+                description:
+                    "肩部拉伸有助于缓解肩部肌肉紧张，改善肩关节活动度，预防肩部损伤。特别适合在肩部训练后进行。",
+                muscles: ["三角肌前束", "三角肌中束", "三角肌后束", "肩袖肌群"],
+                steps: [
+                    "三角肌前束拉伸：将手臂横过胸前，用另一手轻轻加压",
+                    "三角肌后束拉伸：将手臂横过胸前，肘部弯曲90度",
+                    "肩部综合拉伸：双手在背后相扣，向上抬起",
+                    "每个拉伸保持15-30秒，每侧重复2-3次",
+                ],
+                tips: [
+                    "肩部是比较脆弱的关节，拉伸要轻柔",
+                    "如果有关节疼痛，停止拉伸并咨询专业人士",
+                    "可以结合呼吸，呼气时加深拉伸",
+                    "定期进行肩部拉伸可以改善圆肩姿势",
+                ],
+            },
+        ];
 
-      // 训练计划数据
-      let trainingPlans =
-        JSON.parse(localStorage.getItem("trainingPlans")) || {};
+        // 训练计划数据
+        let trainingPlans =
+            JSON.parse(localStorage.getItem("trainingPlans")) || {};
 
-      // 日历相关变量
-      let currentDate = new Date();
+        // 日历相关变量
+        let currentDate = new Date();
 
-      // 计时器相关变量（移到全局作用域）
-      let restTimer = null;
-      let restTimeLeft = 60; // 默认60秒
+        // 计时器相关变量（移到全局作用域）
+        let restTimer = null;
+        let restTimeLeft = 60; // 默认60秒
 
-      // 拖拽相关变量
-      let draggedExercise = null;
+        // 拖拽相关变量
+        let draggedExercise = null;
 
-      // 初始化页面
-      document.addEventListener("DOMContentLoaded", function () {
-        // 渲染所有动作
-        renderExercises(exercises);
+        // 初始化页面
+        document.addEventListener("DOMContentLoaded", function () {
+            // 渲染所有动作
+            renderExercises(exercises);
 
-        // 初始化日历
-        renderCalendar();
-
-        // 初始化添加动作选择框
-        initAddExerciseSelect();
-
-        // 搜索功能
-        const searchInput = document.getElementById("searchInput");
-        searchInput.addEventListener("input", function () {
-          filterExercises();
-        });
-
-        // 部位筛选功能
-        const bodypartButtons = document.querySelectorAll(".bodypart-btn");
-        bodypartButtons.forEach((button) => {
-          button.addEventListener("click", function () {
-            // 移除所有按钮的active类
-            bodypartButtons.forEach((btn) => btn.classList.remove("active"));
-            // 为当前点击的按钮添加active类
-            this.classList.add("active");
-            // 筛选动作
-            filterExercises();
-          });
-        });
-
-        // 日历导航功能
-        document
-          .getElementById("prev-month")
-          .addEventListener("click", function () {
-            currentDate.setMonth(currentDate.getMonth() - 1);
+            // 初始化日历
             renderCalendar();
-          });
 
-        document
-          .getElementById("next-month")
-          .addEventListener("click", function () {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar();
-          });
+            // 初始化添加动作选择框
+            initAddExerciseSelect();
 
-        // 为所有关闭按钮添加点击事件（通过事件委托）
-        document.addEventListener("click", function (e) {
-          if (e.target.classList.contains("close-btn")) {
-            e.target.closest(".plan-detail").style.display = "none";
-          }
+            // 搜索功能
+            const searchInput = document.getElementById("searchInput");
+            searchInput.addEventListener("input", function () {
+                filterExercises();
+            });
+
+            // 部位筛选功能
+            const bodypartButtons = document.querySelectorAll(".bodypart-btn");
+            bodypartButtons.forEach((button) => {
+                button.addEventListener("click", function () {
+                    // 移除所有按钮的active类
+                    bodypartButtons.forEach((btn) => btn.classList.remove("active"));
+                    // 为当前点击的按钮添加active类
+                    this.classList.add("active");
+                    // 筛选动作
+                    filterExercises();
+                });
+            });
+
+            // 日历导航功能
+            document
+                .getElementById("prev-month")
+                .addEventListener("click", function () {
+                    currentDate.setMonth(currentDate.getMonth() - 1);
+                    renderCalendar();
+                });
+
+            document
+                .getElementById("next-month")
+                .addEventListener("click", function () {
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                    renderCalendar();
+                });
+
+            // 为所有关闭按钮添加点击事件（通过事件委托）
+            document.addEventListener("click", function (e) {
+                if (e.target.classList.contains("close-btn")) {
+                    // 关闭训练计划详情
+                    if (e.target.closest(".plan-detail")) {
+                        document.getElementById("plan-detail").style.display = "none";
+                    }
+                    // 关闭动作详情
+                    if (e.target.classList.contains("exercise-close-btn")) {
+                        document.getElementById("exercise-detail-modal").style.display = "none";
+                    }
+                }
+            });
+
+            // 点击详情页面背景关闭详情
+            document.addEventListener("click", function (e) {
+                if (e.target.classList.contains("plan-detail")) {
+                    e.target.style.display = "none";
+                }
+                if (e.target.classList.contains("exercise-detail-modal")) {
+                    e.target.style.display = "none";
+                }
+            });
+
+            // 添加动作按钮
+            document
+                .getElementById("add-exercise-btn")
+                .addEventListener("click", function () {
+                    const select = document.getElementById("add-exercise-select");
+                    const exerciseId = select.value;
+                    const currentDateStr = document
+                        .getElementById("plan-date")
+                        .getAttribute("data-date");
+
+                    if (exerciseId && currentDateStr) {
+                        addExerciseToPlan(currentDateStr, exerciseId);
+                        renderPlanDetail(currentDateStr);
+                    }
+                });
+
+            // 初始化拖拽功能
+            initDragAndDrop();
+
+            // 初始化计时器功能
+            initTimer();
         });
-
-        // 点击详情页面背景关闭详情
-        document.addEventListener("click", function (e) {
-          if (e.target.classList.contains("plan-detail")) {
-            e.target.style.display = "none";
-          }
-        });
-
-        // 添加动作按钮
-        document
-          .getElementById("add-exercise-btn")
-          .addEventListener("click", function () {
-            const select = document.getElementById("add-exercise-select");
-            const exerciseId = select.value;
-            const currentDateStr = document
-              .getElementById("plan-date")
-              .getAttribute("data-date");
-
-            if (exerciseId && currentDateStr) {
-              addExerciseToPlan(currentDateStr, exerciseId);
-              renderPlanDetail(currentDateStr);
-            }
-          });
 
         // 初始化拖拽功能
-        initDragAndDrop();
+        function initDragAndDrop() {
+            // 设置拖拽事件监听器
+            document.addEventListener("dragstart", function (e) {
+                if (e.target.classList.contains("exercise-item")) {
+                    draggedExercise = e.target.getAttribute("data-exercise");
+                    e.target.classList.add("dragging");
+                    e.dataTransfer.setData("text/plain", draggedExercise);
+                }
+            });
+
+            document.addEventListener("dragend", function (e) {
+                if (e.target.classList.contains("exercise-item")) {
+                    e.target.classList.remove("dragging");
+                }
+            });
+
+            document.addEventListener("dragover", function (e) {
+                if (
+                    e.target.classList.contains("calendar-day") &&
+                    e.target.classList.contains("current-month")
+                ) {
+                    e.preventDefault();
+                    e.target.classList.add("drop-zone");
+                }
+            });
+
+            document.addEventListener("dragleave", function (e) {
+                if (e.target.classList.contains("calendar-day")) {
+                    e.target.classList.remove("drop-zone");
+                }
+            });
+
+            document.addEventListener("drop", function (e) {
+                e.preventDefault();
+                if (
+                    e.target.classList.contains("calendar-day") &&
+                    e.target.classList.contains("current-month")
+                ) {
+                    e.target.classList.remove("drop-zone");
+
+                    const dateStr = getDateStringFromElement(e.target);
+                    const exerciseId = e.dataTransfer.getData("text/plain");
+
+                    if (dateStr && exerciseId) {
+                        addExerciseToPlan(dateStr, exerciseId);
+                        renderDayExercises(dateStr);
+                    }
+                }
+            });
+        }
 
         // 初始化计时器功能
-        initTimer();
-      });
+        function initTimer() {
+            const timerModal = document.getElementById("timer-modal");
+            const timerDisplay = document.getElementById("timer-display");
+            const add10sBtn = document.getElementById("add-10s");
+            const subtract10sBtn = document.getElementById("subtract-10s");
+            const skipTimerBtn = document.getElementById("skip-timer");
 
-      // 初始化拖拽功能
-      function initDragAndDrop() {
-        // 设置拖拽事件监听器
-        document.addEventListener("dragstart", function (e) {
-          if (e.target.classList.contains("exercise-item")) {
-            draggedExercise = e.target.getAttribute("data-exercise");
-            e.target.classList.add("dragging");
-            e.dataTransfer.setData("text/plain", draggedExercise);
-          }
-        });
+            // +10秒按钮
+            add10sBtn.addEventListener("click", function () {
+                restTimeLeft += 10;
+                updateTimerDisplay(timerDisplay);
+            });
 
-        document.addEventListener("dragend", function (e) {
-          if (e.target.classList.contains("exercise-item")) {
-            e.target.classList.remove("dragging");
-          }
-        });
+            // -10秒按钮
+            subtract10sBtn.addEventListener("click", function () {
+                if (restTimeLeft > 10) {
+                    restTimeLeft -= 10;
+                    updateTimerDisplay(timerDisplay);
+                }
+            });
 
-        document.addEventListener("dragover", function (e) {
-          if (
-            e.target.classList.contains("calendar-day") &&
-            e.target.classList.contains("current-month")
-          ) {
-            e.preventDefault();
-            e.target.classList.add("drop-zone");
-          }
-        });
+            // 跳过按钮 - 直接关闭计时器界面
+            skipTimerBtn.addEventListener("click", function () {
+                stopTimer();
+                timerModal.style.display = "none";
+                // 重置计时器
+                restTimeLeft = 60;
+                updateTimerDisplay(timerDisplay);
+            });
 
-        document.addEventListener("dragleave", function (e) {
-          if (e.target.classList.contains("calendar-day")) {
-            e.target.classList.remove("drop-zone");
-          }
-        });
-
-        document.addEventListener("drop", function (e) {
-          e.preventDefault();
-          if (
-            e.target.classList.contains("calendar-day") &&
-            e.target.classList.contains("current-month")
-          ) {
-            e.target.classList.remove("drop-zone");
-
-            const dateStr = getDateStringFromElement(e.target);
-            const exerciseId = e.dataTransfer.getData("text/plain");
-
-            if (dateStr && exerciseId) {
-              addExerciseToPlan(dateStr, exerciseId);
-              renderDayExercises(dateStr);
-            }
-          }
-        });
-      }
-
-      // 初始化计时器功能
-      function initTimer() {
-        const timerModal = document.getElementById("timer-modal");
-        const timerDisplay = document.getElementById("timer-display");
-        const add10sBtn = document.getElementById("add-10s");
-        const subtract10sBtn = document.getElementById("subtract-10s");
-        const skipTimerBtn = document.getElementById("skip-timer");
-
-        // +10秒按钮
-        add10sBtn.addEventListener("click", function () {
-          restTimeLeft += 10;
-          updateTimerDisplay(timerDisplay);
-        });
-
-        // -10秒按钮
-        subtract10sBtn.addEventListener("click", function () {
-          if (restTimeLeft > 10) {
-            restTimeLeft -= 10;
+            // 初始显示
             updateTimerDisplay(timerDisplay);
-          }
-        });
-
-        // 跳过按钮 - 直接关闭计时器界面
-        skipTimerBtn.addEventListener("click", function () {
-          stopTimer();
-          timerModal.style.display = "none";
-          // 重置计时器
-          restTimeLeft = 60;
-          updateTimerDisplay(timerDisplay);
-        });
-
-        // 初始显示
-        updateTimerDisplay(timerDisplay);
-      }
-
-      // 更新计时器显示（移到全局作用域）
-      function updateTimerDisplay(timerDisplay) {
-        const minutes = Math.floor(restTimeLeft / 60);
-        const seconds = restTimeLeft % 60;
-        timerDisplay.textContent = `${minutes
-          .toString()
-          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-      }
-
-      // 开始计时器（移到全局作用域）
-      function startTimer() {
-        const timerDisplay = document.getElementById("timer-display");
-
-        if (restTimer) {
-          clearInterval(restTimer);
         }
 
-        // 立即更新一次显示
-        updateTimerDisplay(timerDisplay);
-
-        restTimer = setInterval(function () {
-          restTimeLeft--;
-          updateTimerDisplay(timerDisplay);
-
-          if (restTimeLeft <= 0) {
-            stopTimer();
-            timerDisplay.textContent = "时间到!";
-
-            // 播放提示音
-            playBeepSound();
-
-            // 3秒后自动关闭
-            setTimeout(function () {
-              const timerModal = document.getElementById("timer-modal");
-              timerModal.style.display = "none";
-              // 重置计时器
-              restTimeLeft = 60;
-              updateTimerDisplay(timerDisplay);
-            }, 3000);
-          }
-        }, 1000);
-      }
-
-      // 停止计时器（移到全局作用域）
-      function stopTimer() {
-        if (restTimer) {
-          clearInterval(restTimer);
-          restTimer = null;
-        }
-      }
-
-      // 播放提示音（移到全局作用域）
-      function playBeepSound() {
-        try {
-          const audioContext = new (window.AudioContext ||
-            window.webkitAudioContext)();
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
-
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-
-          oscillator.frequency.value = 800;
-          oscillator.type = "sine";
-
-          gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(
-            0.01,
-            audioContext.currentTime + 1
-          );
-
-          oscillator.start(audioContext.currentTime);
-          oscillator.stop(audioContext.currentTime + 1);
-        } catch (e) {
-          console.log("无法播放提示音:", e);
-        }
-      }
-
-      // 显示计时器弹窗（修复版本）
-      function showTimerModal() {
-        const timerModal = document.getElementById("timer-modal");
-        timerModal.style.display = "flex";
-        // 重置计时器为60秒
-        restTimeLeft = 60;
-        // 立即开始计时
-        startTimer();
-      }
-
-      // 从元素获取日期字符串
-      function getDateStringFromElement(element) {
-        const dayElement = element.querySelector(".day-number");
-        if (!dayElement) return null;
-
-        const day = parseInt(dayElement.textContent);
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1;
-
-        return `${year}-${month}-${day}`;
-      }
-
-      // 渲染动作列表
-      function renderExercises(exercisesToRender) {
-        const exerciseGrid = document.getElementById("exerciseGrid");
-        exerciseGrid.innerHTML = "";
-
-        if (exercisesToRender.length === 0) {
-          exerciseGrid.innerHTML =
-            '<div class="no-results">没有找到匹配的动作</div>';
-          return;
+        // 更新计时器显示（移到全局作用域）
+        function updateTimerDisplay(timerDisplay) {
+            const minutes = Math.floor(restTimeLeft / 60);
+            const seconds = restTimeLeft % 60;
+            timerDisplay.textContent = `${minutes
+                .toString()
+                .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
         }
 
-        exercisesToRender.forEach((exercise) => {
-          const exerciseItem = document.createElement("div");
-          exerciseItem.className = "exercise-item";
-          exerciseItem.setAttribute("data-exercise", exercise.id);
-          exerciseItem.setAttribute("draggable", "true");
+        // 开始计时器（移到全局作用域）
+        function startTimer() {
+            const timerDisplay = document.getElementById("timer-display");
 
-          // 根据类型添加不同的样式类
-          let typeBadge = "";
-          if (exercise.type === "warmup") {
-            typeBadge = '<span class="exercise-type warmup">热身</span>';
-          } else if (exercise.type === "stretch") {
-            typeBadge = '<span class="exercise-type stretch">拉伸</span>';
-          } else if (exercise.type === "training") {
-            typeBadge = '<span class="exercise-type training">训练</span>';
-          }
-
-          exerciseItem.innerHTML = `
-                    ${typeBadge}
-                    <h3>${exercise.name}</h3>
-                    <p>部位: ${exercise.bodyPart}</p>
-                    <div class="muscle-tags">
-                        ${exercise.muscles
-                          .map(
-                            (muscle) =>
-                              `<span class="muscle-tag">${muscle}</span>`
-                          )
-                          .join("")}
-                    </div>
-                `;
-
-          exerciseGrid.appendChild(exerciseItem);
-        });
-      }
-
-      // 筛选动作
-      function filterExercises() {
-        const searchTerm = document
-          .getElementById("searchInput")
-          .value.toLowerCase();
-        const activeBodypart = document.querySelector(".bodypart-btn.active")
-          .dataset.bodypart;
-
-        const filteredExercises = exercises.filter((exercise) => {
-          // 检查动作名称是否匹配
-          const matchesName = exercise.name.toLowerCase().includes(searchTerm);
-
-          // 检查肌肉名称是否匹配
-          const matchesMuscles = exercise.muscles.some((muscle) =>
-            muscle.toLowerCase().includes(searchTerm)
-          );
-
-          // 检查部位是否匹配
-          const matchesBodypart =
-            activeBodypart === "all" || exercise.bodyPart === activeBodypart;
-
-          // 返回匹配结果：名称或肌肉匹配，并且部位和类型匹配
-          return (matchesName || matchesMuscles) && matchesBodypart;
-        });
-
-        renderExercises(filteredExercises);
-      }
-
-      // 渲染日历
-      function renderCalendar() {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-
-        // 更新日历标题
-        document.getElementById("calendar-month").textContent = `${year}年${
-          month + 1
-        }月`;
-
-        // 获取当月第一天和最后一天
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-
-        // 获取当月第一天是星期几 (0 = 星期日, 6 = 星期六)
-        const firstDayIndex = firstDay.getDay();
-
-        // 获取当月总天数
-        const daysInMonth = lastDay.getDate();
-
-        // 获取上个月最后几天
-        const prevLastDay = new Date(year, month, 0).getDate();
-
-        // 清空日历
-        const calendarDays = document.getElementById("calendar-days");
-        calendarDays.innerHTML = "";
-
-        // 添加上个月的日期
-        for (let i = firstDayIndex; i > 0; i--) {
-          const dayElement = document.createElement("div");
-          dayElement.className = "calendar-day empty";
-          dayElement.textContent = prevLastDay - i + 1;
-          calendarDays.appendChild(dayElement);
-        }
-
-        // 添加当月日期
-        const today = new Date();
-        for (let i = 1; i <= daysInMonth; i++) {
-          const dayElement = document.createElement("div");
-          dayElement.className = "calendar-day current-month";
-
-          // 检查是否是今天
-          if (
-            year === today.getFullYear() &&
-            month === today.getMonth() &&
-            i === today.getDate()
-          ) {
-            dayElement.classList.add("today");
-          }
-
-          const dateStr = `${year}-${month + 1}-${i}`;
-
-          dayElement.innerHTML = `
-                    <div class="day-number">${i}</div>
-                    <div class="day-exercises" id="day-${dateStr}"></div>
-                `;
-
-          // 添加点击事件，打开计划详情
-          dayElement.addEventListener("click", function () {
-            showPlanDetail(dateStr);
-          });
-
-          calendarDays.appendChild(dayElement);
-
-          // 渲染当天的训练计划
-          renderDayExercises(dateStr);
-        }
-
-        // 计算还需要添加多少天来填满日历
-        const totalCells = 42; // 6行 * 7天
-        const remainingCells = totalCells - (firstDayIndex + daysInMonth);
-
-        // 添加下个月的日期
-        for (let i = 1; i <= remainingCells; i++) {
-          const dayElement = document.createElement("div");
-          dayElement.className = "calendar-day empty";
-          dayElement.textContent = i;
-          calendarDays.appendChild(dayElement);
-        }
-      }
-
-      // 渲染某一天的训练动作
-      function renderDayExercises(dateStr) {
-        const dayExercisesElement = document.getElementById(`day-${dateStr}`);
-        if (!dayExercisesElement) return;
-
-        dayExercisesElement.innerHTML = "";
-
-        if (trainingPlans[dateStr] && trainingPlans[dateStr].length > 0) {
-          trainingPlans[dateStr].forEach((exerciseId) => {
-            const exercise = exercises.find((e) => e.id === exerciseId);
-            if (exercise) {
-              const badge = document.createElement("span");
-              badge.className = "exercise-badge";
-
-              // 根据动作类型添加不同的样式类
-              if (exercise.type === "warmup") {
-                badge.classList.add("warmup");
-              } else if (exercise.type === "stretch") {
-                badge.classList.add("stretch");
-              }
-
-              badge.textContent = exercise.name;
-              dayExercisesElement.appendChild(badge);
+            if (restTimer) {
+                clearInterval(restTimer);
             }
-          });
+
+            // 立即更新一次显示
+            updateTimerDisplay(timerDisplay);
+
+            restTimer = setInterval(function () {
+                restTimeLeft--;
+                updateTimerDisplay(timerDisplay);
+
+                if (restTimeLeft <= 0) {
+                    stopTimer();
+                    timerDisplay.textContent = "时间到!";
+
+                    // 播放提示音
+                    playBeepSound();
+
+                    // 3秒后自动关闭
+                    setTimeout(function () {
+                        const timerModal = document.getElementById("timer-modal");
+                        timerModal.style.display = "none";
+                        // 重置计时器
+                        restTimeLeft = 60;
+                        updateTimerDisplay(timerDisplay);
+                    }, 3000);
+                }
+            }, 1000);
         }
-      }
 
-      // 显示训练计划详情
-      function showPlanDetail(dateStr) {
-        document.getElementById(
-          "plan-date"
-        ).textContent = `${dateStr} 训练计划`;
-        document.getElementById("plan-date").setAttribute("data-date", dateStr);
-        renderPlanDetail(dateStr);
-        document.getElementById("plan-detail").style.display = "block";
-      }
-
-      // 渲染训练计划详情
-      function renderPlanDetail(dateStr) {
-        const planExercisesElement = document.getElementById("plan-exercises");
-        planExercisesElement.innerHTML = "";
-
-        if (!trainingPlans[dateStr] || trainingPlans[dateStr].length === 0) {
-          planExercisesElement.innerHTML =
-            '<p style="text-align: center; color: #666;">暂无训练计划，请添加动作</p>';
-          return;
+        // 停止计时器（移到全局作用域）
+        function stopTimer() {
+            if (restTimer) {
+                clearInterval(restTimer);
+                restTimer = null;
+            }
         }
 
-        trainingPlans[dateStr].forEach((exerciseId, index) => {
-          const exercise = exercises.find((e) => e.id === exerciseId);
-          if (exercise) {
-            const exerciseItem = document.createElement("div");
-            exerciseItem.className = "plan-exercise-item";
+        // 播放提示音（移到全局作用域）
+        function playBeepSound() {
+            try {
+                const audioContext = new (window.AudioContext ||
+                    window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
 
-            // 获取该动作的训练数据
-            const exerciseData = getExerciseData(dateStr, exerciseId) || {
-              sets: [{ reps: "", weight: "", completed: false }],
-            };
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
 
-            exerciseItem.innerHTML = `
-                        <div class="exercise-header">
+                oscillator.frequency.value = 800;
+                oscillator.type = "sine";
+
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(
+                    0.01,
+                    audioContext.currentTime + 1
+                );
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 1);
+            } catch (e) {
+                console.log("无法播放提示音:", e);
+            }
+        }
+
+        // 显示计时器弹窗（修复版本）
+        function showTimerModal() {
+            const timerModal = document.getElementById("timer-modal");
+            timerModal.style.display = "flex";
+            // 重置计时器为60秒
+            restTimeLeft = 60;
+            // 立即开始计时
+            startTimer();
+        }
+
+        // 从元素获取日期字符串
+        function getDateStringFromElement(element) {
+            const dayElement = element.querySelector(".day-number");
+            if (!dayElement) return null;
+
+            const day = parseInt(dayElement.textContent);
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1;
+
+            return `${year}-${month}-${day}`;
+        }
+
+        // 渲染动作列表
+        function renderExercises(exercisesToRender) {
+            const exerciseGrid = document.getElementById("exerciseGrid");
+            exerciseGrid.innerHTML = "";
+
+            if (exercisesToRender.length === 0) {
+                exerciseGrid.innerHTML =
+                    '<div class="no-results">没有找到匹配的动作</div>';
+                return;
+            }
+
+            exercisesToRender.forEach((exercise) => {
+                const exerciseItem = document.createElement("div");
+                exerciseItem.className = "exercise-item";
+                exerciseItem.setAttribute("data-exercise", exercise.id);
+                exerciseItem.setAttribute("draggable", "true");
+
+                // 根据类型添加不同的样式类
+                let typeBadge = "";
+                if (exercise.type === "warmup") {
+                    typeBadge = '<span class="exercise-type warmup">热身</span>';
+                } else if (exercise.type === "stretch") {
+                    typeBadge = '<span class="exercise-type stretch">拉伸</span>';
+                } else if (exercise.type === "training") {
+                    typeBadge = '<span class="exercise-type training">训练</span>';
+                }
+
+                exerciseItem.innerHTML = `
+                            ${typeBadge}
                             <h3>${exercise.name}</h3>
-                            <button class="remove-exercise" data-exercise="${exerciseId}">删除</button>
-                        </div>
-                        <div class="sets-container" id="sets-${exerciseId}">
-                            ${exerciseData.sets
-                              .map(
-                                (set, setIndex) => `
-                                <div class="set-item">
-                                    <div class="set-number">第${
-                                      setIndex + 1
-                                    }组</div>
-                                    <div class="input-with-unit">
-                                        <input type="number" class="set-input reps-input" placeholder="次数" value="${
-                                          set.reps || ""
-                                        }" data-set="${setIndex}" data-exercise="${exerciseId}">
-                                        <span class="unit-label">次</span>
-                                    </div>
-                                    <div class="input-with-unit">
-                                        <input type="number" class="set-input weight-input" placeholder="重量" value="${
-                                          set.weight || ""
-                                        }" data-set="${setIndex}" data-exercise="${exerciseId}">
-                                        <span class="unit-label">kg</span>
-                                    </div>
-                                    <div class="set-complete">
-                                        <input type="checkbox" class="complete-checkbox" ${
-                                          set.completed ? "checked" : ""
-                                        } data-set="${setIndex}" data-exercise="${exerciseId}">
-                                        <span class="complete-label">完成</span>
-                                    </div>
-                                    <button class="delete-set-btn" data-set="${setIndex}" data-exercise="${exerciseId}">删除组</button>
-                                </div>
-                            `
-                              )
-                              .join("")}
-                        </div>
-                        <button class="add-set-btn" data-exercise="${exerciseId}">添加组</button>
-                    `;
+                            <p>部位: ${exercise.bodyPart}</p>
+                            <div class="muscle-tags">
+                                ${exercise.muscles
+                                    .map(
+                                        (muscle) =>
+                                            `<span class="muscle-tag">${muscle}</span>`
+                                    )
+                                    .join("")}
+                            </div>
+                        `;
 
-            planExercisesElement.appendChild(exerciseItem);
-          }
-        });
+                exerciseGrid.appendChild(exerciseItem);
+            });
+        }
 
-        // 添加事件监听器
-        addPlanEventListeners(dateStr);
-      }
+        // 筛选动作
+        function filterExercises() {
+            const searchTerm = document
+                .getElementById("searchInput")
+                .value.toLowerCase();
+            const activeBodypart = document.querySelector(".bodypart-btn.active")
+                .dataset.bodypart;
 
-      // 添加训练计划详情的事件监听器
-      function addPlanEventListeners(dateStr) {
-        // 删除动作按钮
-        document.querySelectorAll(".remove-exercise").forEach((button) => {
-          button.addEventListener("click", function () {
-            const exerciseId = this.getAttribute("data-exercise");
-            removeExerciseFromPlan(dateStr, exerciseId);
-            renderPlanDetail(dateStr);
-            renderDayExercises(dateStr);
-          });
-        });
+            const filteredExercises = exercises.filter((exercise) => {
+                // 检查动作名称是否匹配
+                const matchesName = exercise.name.toLowerCase().includes(searchTerm);
 
-        // 添加组按钮
-        document.querySelectorAll(".add-set-btn").forEach((button) => {
-          button.addEventListener("click", function () {
-            const exerciseId = this.getAttribute("data-exercise");
-            addSetToExercise(dateStr, exerciseId);
-            renderPlanDetail(dateStr);
-          });
-        });
+                // 检查肌肉名称是否匹配
+                const matchesMuscles = exercise.muscles.some((muscle) =>
+                    muscle.toLowerCase().includes(searchTerm)
+                );
 
-        // 删除组按钮
-        document.querySelectorAll(".delete-set-btn").forEach((button) => {
-          button.addEventListener("click", function () {
-            const exerciseId = this.getAttribute("data-exercise");
-            const setIndex = parseInt(this.getAttribute("data-set"));
-            removeSetFromExercise(dateStr, exerciseId, setIndex);
-            renderPlanDetail(dateStr);
-          });
-        });
+                // 检查部位是否匹配
+                const matchesBodypart =
+                    activeBodypart === "all" || exercise.bodyPart === activeBodypart;
 
-        // 输入框变化事件
-        document.querySelectorAll(".set-input").forEach((input) => {
-          input.addEventListener("change", function () {
-            const exerciseId = this.getAttribute("data-exercise");
-            const setIndex = parseInt(this.getAttribute("data-set"));
-            const field = this.classList.contains("reps-input")
-              ? "reps"
-              : "weight";
-            const value = this.value;
+                // 返回匹配结果：名称或肌肉匹配，并且部位和类型匹配
+                return (matchesName || matchesMuscles) && matchesBodypart;
+            });
 
-            updateExerciseData(dateStr, exerciseId, setIndex, field, value);
-          });
-        });
+            renderExercises(filteredExercises);
+        }
 
-        // 完成复选框事件
-        document.querySelectorAll(".complete-checkbox").forEach((checkbox) => {
-          checkbox.addEventListener("change", function () {
-            const exerciseId = this.getAttribute("data-exercise");
-            const setIndex = parseInt(this.getAttribute("data-set"));
-            const completed = this.checked;
+        // 渲染日历
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
 
-            updateExerciseData(
-              dateStr,
-              exerciseId,
-              setIndex,
-              "completed",
-              completed
-            );
+            // 更新日历标题
+            document.getElementById("calendar-month").textContent = `${year}年${
+                month + 1
+            }月`;
 
-            // 如果完成，启动休息计时器
-            if (completed) {
-              showTimerModal();
+            // 获取当月第一天和最后一天
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+
+            // 获取当月第一天是星期几 (0 = 星期日, 6 = 星期六)
+            const firstDayIndex = firstDay.getDay();
+
+            // 获取当月总天数
+            const daysInMonth = lastDay.getDate();
+
+            // 获取上个月最后几天
+            const prevLastDay = new Date(year, month, 0).getDate();
+
+            // 清空日历
+            const calendarDays = document.getElementById("calendar-days");
+            calendarDays.innerHTML = "";
+
+            // 添加上个月的日期
+            for (let i = firstDayIndex; i > 0; i--) {
+                const dayElement = document.createElement("div");
+                dayElement.className = "calendar-day empty";
+                dayElement.textContent = prevLastDay - i + 1;
+                calendarDays.appendChild(dayElement);
             }
-          });
+
+            // 添加当月日期
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement("div");
+                dayElement.className = "calendar-day current-month";
+
+                // 检查是否是今天
+                if (
+                    year === today.getFullYear() &&
+                    month === today.getMonth() &&
+                    i === today.getDate()
+                ) {
+                    dayElement.classList.add("today");
+                }
+
+                const dateStr = `${year}-${month + 1}-${i}`;
+
+                dayElement.innerHTML = `
+                            <div class="day-number">${i}</div>
+                            <div class="day-exercises" id="day-${dateStr}"></div>
+                        `;
+
+                // 添加点击事件，打开计划详情
+                dayElement.addEventListener("click", function () {
+                    showPlanDetail(dateStr);
+                });
+
+                calendarDays.appendChild(dayElement);
+
+                // 渲染当天的训练计划
+                renderDayExercises(dateStr);
+            }
+
+            // 计算还需要添加多少天来填满日历
+            const totalCells = 42; // 6行 * 7天
+            const remainingCells = totalCells - (firstDayIndex + daysInMonth);
+
+            // 添加下个月的日期
+            for (let i = 1; i <= remainingCells; i++) {
+                const dayElement = document.createElement("div");
+                dayElement.className = "calendar-day empty";
+                dayElement.textContent = i;
+                calendarDays.appendChild(dayElement);
+            }
+        }
+
+        // 渲染某一天的训练动作
+        function renderDayExercises(dateStr) {
+            const dayExercisesElement = document.getElementById(`day-${dateStr}`);
+            if (!dayExercisesElement) return;
+
+            dayExercisesElement.innerHTML = "";
+
+            if (trainingPlans[dateStr] && trainingPlans[dateStr].length > 0) {
+                trainingPlans[dateStr].forEach((exerciseId) => {
+                    const exercise = exercises.find((e) => e.id === exerciseId);
+                    if (exercise) {
+                        const badge = document.createElement("span");
+                        badge.className = "exercise-badge";
+
+                        // 根据动作类型添加不同的样式类
+                        if (exercise.type === "warmup") {
+                            badge.classList.add("warmup");
+                        } else if (exercise.type === "stretch") {
+                            badge.classList.add("stretch");
+                        }
+
+                        badge.textContent = exercise.name;
+                        dayExercisesElement.appendChild(badge);
+                    }
+                });
+            }
+        }
+
+        // 显示训练计划详情
+        function showPlanDetail(dateStr) {
+            document.getElementById(
+                "plan-date"
+            ).textContent = `${dateStr} 训练计划`;
+            document.getElementById("plan-date").setAttribute("data-date", dateStr);
+            renderPlanDetail(dateStr);
+            document.getElementById("plan-detail").style.display = "block";
+        }
+
+        // 渲染训练计划详情
+        function renderPlanDetail(dateStr) {
+            const planExercisesElement = document.getElementById("plan-exercises");
+            planExercisesElement.innerHTML = "";
+
+            if (!trainingPlans[dateStr] || trainingPlans[dateStr].length === 0) {
+                planExercisesElement.innerHTML =
+                    '<p style="text-align: center; color: #666;">暂无训练计划，请添加动作</p>';
+                return;
+            }
+
+            trainingPlans[dateStr].forEach((exerciseId, index) => {
+                const exercise = exercises.find((e) => e.id === exerciseId);
+                if (exercise) {
+                    const exerciseItem = document.createElement("div");
+                    exerciseItem.className = "plan-exercise-item";
+
+                    // 获取该动作的训练数据
+                    const exerciseData = getExerciseData(dateStr, exerciseId) || {
+                        sets: [{ reps: "", weight: "", completed: false }],
+                    };
+
+                    exerciseItem.innerHTML = `
+                                <div class="exercise-header">
+                                    <h3>${exercise.name}</h3>
+                                    <button class="remove-exercise" data-exercise="${exerciseId}">删除</button>
+                                </div>
+                                <div class="sets-container" id="sets-${exerciseId}">
+                                    ${exerciseData.sets
+                                        .map(
+                                            (set, setIndex) => `
+                                        <div class="set-item">
+                                            <div class="set-number">第${
+                                                setIndex + 1
+                                            }组</div>
+                                            <div class="input-with-unit">
+                                                <input type="number" class="set-input reps-input" placeholder="次数" value="${
+                                                    set.reps || ""
+                                                }" data-set="${setIndex}" data-exercise="${exerciseId}">
+                                                <span class="unit-label">次</span>
+                                            </div>
+                                            <div class="input-with-unit">
+                                                <input type="number" class="set-input weight-input" placeholder="重量" value="${
+                                                    set.weight || ""
+                                                }" data-set="${setIndex}" data-exercise="${exerciseId}">
+                                                <span class="unit-label">kg</span>
+                                            </div>
+                                            <div class="set-complete">
+                                                <input type="checkbox" class="complete-checkbox" ${
+                                                    set.completed ? "checked" : ""
+                                                } data-set="${setIndex}" data-exercise="${exerciseId}">
+                                                <span class="complete-label">完成</span>
+                                            </div>
+                                            <button class="delete-set-btn" data-set="${setIndex}" data-exercise="${exerciseId}">删除组</button>
+                                        </div>
+                                    `
+                                        )
+                                        .join("")}
+                                </div>
+                                <button class="add-set-btn" data-exercise="${exerciseId}">添加组</button>
+                            `;
+
+                    planExercisesElement.appendChild(exerciseItem);
+                }
+            });
+
+            // 添加事件监听器
+            addPlanEventListeners(dateStr);
+        }
+
+        // 添加训练计划详情的事件监听器
+        function addPlanEventListeners(dateStr) {
+            // 删除动作按钮
+            document.querySelectorAll(".remove-exercise").forEach((button) => {
+                button.addEventListener("click", function () {
+                    const exerciseId = this.getAttribute("data-exercise");
+                    removeExerciseFromPlan(dateStr, exerciseId);
+                    renderPlanDetail(dateStr);
+                    renderDayExercises(dateStr);
+                });
+            });
+
+            // 添加组按钮
+            document.querySelectorAll(".add-set-btn").forEach((button) => {
+                button.addEventListener("click", function () {
+                    const exerciseId = this.getAttribute("data-exercise");
+                    addSetToExercise(dateStr, exerciseId);
+                    renderPlanDetail(dateStr);
+                });
+            });
+
+            // 删除组按钮
+            document.querySelectorAll(".delete-set-btn").forEach((button) => {
+                button.addEventListener("click", function () {
+                    const exerciseId = this.getAttribute("data-exercise");
+                    const setIndex = parseInt(this.getAttribute("data-set"));
+                    removeSetFromExercise(dateStr, exerciseId, setIndex);
+                    renderPlanDetail(dateStr);
+                });
+            });
+
+            // 输入框变化事件
+            document.querySelectorAll(".set-input").forEach((input) => {
+                input.addEventListener("change", function () {
+                    const exerciseId = this.getAttribute("data-exercise");
+                    const setIndex = parseInt(this.getAttribute("data-set"));
+                    const field = this.classList.contains("reps-input")
+                        ? "reps"
+                        : "weight";
+                    const value = this.value;
+
+                    updateExerciseData(dateStr, exerciseId, setIndex, field, value);
+                });
+            });
+
+            // 完成复选框事件
+            document.querySelectorAll(".complete-checkbox").forEach((checkbox) => {
+                checkbox.addEventListener("change", function () {
+                    const exerciseId = this.getAttribute("data-exercise");
+                    const setIndex = parseInt(this.getAttribute("data-set"));
+                    const completed = this.checked;
+
+                    updateExerciseData(
+                        dateStr,
+                        exerciseId,
+                        setIndex,
+                        "completed",
+                        completed
+                    );
+
+                    // 如果完成，启动休息计时器
+                    if (completed) {
+                        showTimerModal();
+                    }
+                });
+            });
+        }
+
+        // 获取动作的训练数据
+        function getExerciseData(dateStr, exerciseId) {
+            if (!trainingPlans[dateStr] || !trainingPlans[dateStr].exerciseData) {
+                return null;
+            }
+            return trainingPlans[dateStr].exerciseData[exerciseId];
+        }
+
+        // 更新动作的训练数据
+        function updateExerciseData(dateStr, exerciseId, setIndex, field, value) {
+            if (!trainingPlans[dateStr].exerciseData) {
+                trainingPlans[dateStr].exerciseData = {};
+            }
+
+            if (!trainingPlans[dateStr].exerciseData[exerciseId]) {
+                trainingPlans[dateStr].exerciseData[exerciseId] = {
+                    sets: [],
+                };
+            }
+
+            if (!trainingPlans[dateStr].exerciseData[exerciseId].sets[setIndex]) {
+                trainingPlans[dateStr].exerciseData[exerciseId].sets[setIndex] = {};
+            }
+
+            trainingPlans[dateStr].exerciseData[exerciseId].sets[setIndex][field] =
+                value;
+            saveTrainingPlans();
+        }
+
+        // 添加组到动作
+        function addSetToExercise(dateStr, exerciseId) {
+            if (!trainingPlans[dateStr].exerciseData) {
+                trainingPlans[dateStr].exerciseData = {};
+            }
+
+            if (!trainingPlans[dateStr].exerciseData[exerciseId]) {
+                trainingPlans[dateStr].exerciseData[exerciseId] = {
+                    sets: [],
+                };
+            }
+
+            trainingPlans[dateStr].exerciseData[exerciseId].sets.push({
+                reps: "",
+                weight: "",
+                completed: false,
+            });
+
+            saveTrainingPlans();
+        }
+
+        // 从动作中删除组
+        function removeSetFromExercise(dateStr, exerciseId, setIndex) {
+            if (
+                !trainingPlans[dateStr].exerciseData ||
+                !trainingPlans[dateStr].exerciseData[exerciseId] ||
+                !trainingPlans[dateStr].exerciseData[exerciseId].sets[setIndex]
+            ) {
+                return;
+            }
+
+            trainingPlans[dateStr].exerciseData[exerciseId].sets.splice(
+                setIndex,
+                1
+            );
+            saveTrainingPlans();
+        }
+
+        // 添加动作到计划
+        function addExerciseToPlan(dateStr, exerciseId) {
+            if (!trainingPlans[dateStr]) {
+                trainingPlans[dateStr] = [];
+            }
+
+            if (!trainingPlans[dateStr].includes(exerciseId)) {
+                trainingPlans[dateStr].push(exerciseId);
+                saveTrainingPlans();
+            }
+        }
+
+        // 从计划中删除动作
+        function removeExerciseFromPlan(dateStr, exerciseId) {
+            if (!trainingPlans[dateStr]) return;
+
+            const index = trainingPlans[dateStr].indexOf(exerciseId);
+            if (index !== -1) {
+                trainingPlans[dateStr].splice(index, 1);
+
+                // 同时删除相关的训练数据
+                if (
+                    trainingPlans[dateStr].exerciseData &&
+                    trainingPlans[dateStr].exerciseData[exerciseId]
+                ) {
+                    delete trainingPlans[dateStr].exerciseData[exerciseId];
+                }
+
+                saveTrainingPlans();
+            }
+        }
+
+        // 初始化添加动作选择框
+        function initAddExerciseSelect() {
+            const select = document.getElementById("add-exercise-select");
+            select.innerHTML = '<option value="">选择要添加的动作...</option>';
+
+            exercises.forEach((exercise) => {
+                const option = document.createElement("option");
+                option.value = exercise.id;
+                option.textContent = exercise.name;
+                select.appendChild(option);
+            });
+        }
+
+        // 保存训练计划到本地存储
+        function saveTrainingPlans() {
+            localStorage.setItem("trainingPlans", JSON.stringify(trainingPlans));
+        }
+
+        // 添加动作详情点击事件监听器（使用事件委托）
+        document.addEventListener("click", function (e) {
+            // 检查点击的是否是动作卡片（排除拖拽和内部元素）
+            if (
+                e.target.closest(".exercise-item") &&
+                !e.target.closest(".exercise-item").classList.contains("dragging")
+            ) {
+                const exerciseItem = e.target.closest(".exercise-item");
+                const exerciseId = exerciseItem.getAttribute("data-exercise");
+                showExerciseDetail(exerciseId);
+            }
         });
-      }
 
-      // 获取动作的训练数据
-      function getExerciseData(dateStr, exerciseId) {
-        if (!trainingPlans[dateStr] || !trainingPlans[dateStr].exerciseData) {
-          return null;
-        }
-        return trainingPlans[dateStr].exerciseData[exerciseId];
-      }
+        // 显示动作详情
+        function showExerciseDetail(exerciseId) {
+            const exercise = exercises.find((e) => e.id === exerciseId);
+            if (!exercise) return;
 
-      // 更新动作的训练数据
-      function updateExerciseData(dateStr, exerciseId, setIndex, field, value) {
-        if (!trainingPlans[dateStr].exerciseData) {
-          trainingPlans[dateStr].exerciseData = {};
-        }
+            // 设置基本信息
+            document.getElementById("exercise-detail-title").textContent =
+                exercise.name;
+            document.getElementById(
+                "exercise-detail-bodypart"
+            ).textContent = `部位: ${exercise.bodyPart}`;
+            document.getElementById("exercise-detail-description").textContent =
+                exercise.description;
 
-        if (!trainingPlans[dateStr].exerciseData[exerciseId]) {
-          trainingPlans[dateStr].exerciseData[exerciseId] = {
-            sets: [],
-          };
-        }
+            // 设置动作类型
+            const typeElement = document.getElementById("exercise-detail-type");
+            typeElement.textContent = getExerciseTypeText(exercise.type);
+            typeElement.className = "exercise-detail-type " + exercise.type;
 
-        if (!trainingPlans[dateStr].exerciseData[exerciseId].sets[setIndex]) {
-          trainingPlans[dateStr].exerciseData[exerciseId].sets[setIndex] = {};
-        }
+            // 设置目标肌肉
+            const musclesElement = document.getElementById(
+                "exercise-detail-muscles"
+            );
+            musclesElement.innerHTML = "";
+            exercise.muscles.forEach((muscle) => {
+                const muscleTag = document.createElement("span");
+                muscleTag.className = "muscle-tag";
+                muscleTag.textContent = muscle;
+                musclesElement.appendChild(muscleTag);
+            });
 
-        trainingPlans[dateStr].exerciseData[exerciseId].sets[setIndex][field] =
-          value;
-        saveTrainingPlans();
-      }
+            // 设置执行步骤
+            const stepsElement = document.getElementById("exercise-detail-steps");
+            stepsElement.innerHTML = "";
+            exercise.steps.forEach((step) => {
+                const stepItem = document.createElement("li");
+                stepItem.textContent = step;
+                stepsElement.appendChild(stepItem);
+            });
 
-      // 添加组到动作
-      function addSetToExercise(dateStr, exerciseId) {
-        if (!trainingPlans[dateStr].exerciseData) {
-          trainingPlans[dateStr].exerciseData = {};
-        }
+            // 设置训练技巧
+            const tipsElement = document.getElementById("exercise-detail-tips");
+            tipsElement.innerHTML = "";
+            if (exercise.tips && exercise.tips.length > 0) {
+                exercise.tips.forEach((tip) => {
+                    const tipItem = document.createElement("li");
+                    tipItem.textContent = tip;
+                    tipsElement.appendChild(tipItem);
+                });
+            } else {
+                const noTips = document.createElement("li");
+                noTips.textContent = "暂无特别的训练技巧提示。";
+                tipsElement.appendChild(noTips);
+            }
 
-        if (!trainingPlans[dateStr].exerciseData[exerciseId]) {
-          trainingPlans[dateStr].exerciseData[exerciseId] = {
-            sets: [],
-          };
-        }
+            // 设置GIF图片
+            const gifElement = document.getElementById("exercise-detail-gif");
+            gifElement.innerHTML = "";
+            if (exercise.gif) {
+                const gifImg = document.createElement("img");
+                gifImg.src = exercise.gif;
+                gifImg.alt = exercise.name;
+                gifElement.appendChild(gifImg);
+            } else {
+                gifElement.innerHTML = "<p>暂无动作演示图</p>";
+            }
 
-        trainingPlans[dateStr].exerciseData[exerciseId].sets.push({
-          reps: "",
-          weight: "",
-          completed: false,
-        });
-
-        saveTrainingPlans();
-      }
-
-      // 从动作中删除组
-      function removeSetFromExercise(dateStr, exerciseId, setIndex) {
-        if (
-          !trainingPlans[dateStr].exerciseData ||
-          !trainingPlans[dateStr].exerciseData[exerciseId] ||
-          !trainingPlans[dateStr].exerciseData[exerciseId].sets[setIndex]
-        ) {
-          return;
-        }
-
-        trainingPlans[dateStr].exerciseData[exerciseId].sets.splice(
-          setIndex,
-          1
-        );
-        saveTrainingPlans();
-      }
-
-      // 添加动作到计划
-      function addExerciseToPlan(dateStr, exerciseId) {
-        if (!trainingPlans[dateStr]) {
-          trainingPlans[dateStr] = [];
-        }
-
-        if (!trainingPlans[dateStr].includes(exerciseId)) {
-          trainingPlans[dateStr].push(exerciseId);
-          saveTrainingPlans();
-        }
-      }
-
-      // 从计划中删除动作
-      function removeExerciseFromPlan(dateStr, exerciseId) {
-        if (!trainingPlans[dateStr]) return;
-
-        const index = trainingPlans[dateStr].indexOf(exerciseId);
-        if (index !== -1) {
-          trainingPlans[dateStr].splice(index, 1);
-
-          // 同时删除相关的训练数据
-          if (
-            trainingPlans[dateStr].exerciseData &&
-            trainingPlans[dateStr].exerciseData[exerciseId]
-          ) {
-            delete trainingPlans[dateStr].exerciseData[exerciseId];
-          }
-
-          saveTrainingPlans();
-        }
-      }
-
-      // 初始化添加动作选择框
-      function initAddExerciseSelect() {
-        const select = document.getElementById("add-exercise-select");
-        select.innerHTML = '<option value="">选择要添加的动作...</option>';
-
-        exercises.forEach((exercise) => {
-          const option = document.createElement("option");
-          option.value = exercise.id;
-          option.textContent = exercise.name;
-          select.appendChild(option);
-        });
-      }
-
-      // 保存训练计划到本地存储
-      function saveTrainingPlans() {
-        localStorage.setItem("trainingPlans", JSON.stringify(trainingPlans));
-      }
-
-      // 添加动作详情点击事件监听器（使用事件委托）
-      document.addEventListener("click", function (e) {
-        // 检查点击的是否是动作卡片（排除拖拽和内部元素）
-        if (
-          e.target.closest(".exercise-item") &&
-          !e.target.closest(".exercise-item").classList.contains("dragging")
-        ) {
-          const exerciseItem = e.target.closest(".exercise-item");
-          const exerciseId = exerciseItem.getAttribute("data-exercise");
-          showExerciseDetail(exerciseId);
-        }
-      });
-
-      // 关闭动作详情弹窗
-      document.addEventListener("click", function (e) {
-        if (
-          e.target.classList.contains("close-exercise-btn") ||
-          e.target.classList.contains("exercise-detail-modal")
-        ) {
-          document.getElementById("exercise-detail-modal").style.display =
-            "none";
-        }
-      });
-
-      // 添加到今日计划按钮
-      document
-        .getElementById("add-to-plan-btn")
-        .addEventListener("click", function () {
-          const exerciseId = this.getAttribute("data-exercise-id");
-          const today = new Date();
-          const todayStr = `${today.getFullYear()}-${
-            today.getMonth() + 1
-          }-${today.getDate()}`;
-
-          if (exerciseId) {
-            addExerciseToPlan(todayStr, exerciseId);
+            // 显示弹窗
             document.getElementById("exercise-detail-modal").style.display =
-              "none";
-
-            // 可选：显示添加成功的提示
-            alert("动作已成功添加到今日训练计划！");
-          }
-        });
-
-      // 显示动作详情
-      function showExerciseDetail(exerciseId) {
-        const exercise = exercises.find((e) => e.id === exerciseId);
-        if (!exercise) return;
-
-        // 设置基本信息
-        document.getElementById("exercise-detail-title").textContent =
-          exercise.name;
-        document.getElementById(
-          "exercise-detail-bodypart"
-        ).textContent = `部位: ${exercise.bodyPart}`;
-        document.getElementById("exercise-detail-description").textContent =
-          exercise.description;
-
-        // 设置动作类型
-        const typeElement = document.getElementById("exercise-detail-type");
-        typeElement.textContent = getExerciseTypeText(exercise.type);
-        typeElement.className = "exercise-detail-type " + exercise.type;
-
-        // 设置目标肌肉
-        const musclesElement = document.getElementById(
-          "exercise-detail-muscles"
-        );
-        musclesElement.innerHTML = "";
-        exercise.muscles.forEach((muscle) => {
-          const muscleTag = document.createElement("span");
-          muscleTag.className = "muscle-tag";
-          muscleTag.textContent = muscle;
-          musclesElement.appendChild(muscleTag);
-        });
-
-        // 设置执行步骤
-        const stepsElement = document.getElementById("exercise-detail-steps");
-        stepsElement.innerHTML = "";
-        exercise.steps.forEach((step) => {
-          const stepItem = document.createElement("li");
-          stepItem.textContent = step;
-          stepsElement.appendChild(stepItem);
-        });
-
-        // 设置训练技巧
-        const tipsElement = document.getElementById("exercise-detail-tips");
-        tipsElement.innerHTML = "";
-        if (exercise.tips && exercise.tips.length > 0) {
-          exercise.tips.forEach((tip) => {
-            const tipItem = document.createElement("li");
-            tipItem.textContent = tip;
-            tipsElement.appendChild(tipItem);
-          });
-        } else {
-          const noTips = document.createElement("li");
-          noTips.textContent = "暂无特别的训练技巧提示。";
-          tipsElement.appendChild(noTips);
+                "block";
         }
 
-        // 设置GIF图片
-        const gifElement = document.getElementById("exercise-detail-gif");
-        gifElement.innerHTML = "";
-        if (exercise.gif) {
-          const gifImg = document.createElement("img");
-          gifImg.src = exercise.gif;
-          gifImg.alt = exercise.name;
-          gifElement.appendChild(gifImg);
-        } else {
-          gifElement.innerHTML = "<p>暂无动作演示图</p>";
+        // 获取动作类型的中文文本
+        function getExerciseTypeText(type) {
+            switch (type) {
+                case "warmup":
+                    return "热身";
+                case "stretch":
+                    return "拉伸";
+                case "training":
+                    return "训练";
+                default:
+                    return "训练";
+            }
         }
-
-        // 显示弹窗
-        document.getElementById("exercise-detail-modal").style.display =
-          "block";
-      }
-
-      // 获取动作类型的中文文本
-      function getExerciseTypeText(type) {
-        switch (type) {
-          case "warmup":
-            return "热身";
-          case "stretch":
-            return "拉伸";
-          case "training":
-            return "训练";
-          default:
-            return "训练";
-        }
-      }
     </script>
-  </body>
+</body>
 </html>
