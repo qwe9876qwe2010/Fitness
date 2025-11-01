@@ -364,6 +364,11 @@
         color: #0c5460;
       }
 
+      .exercise-type.training {
+        background: #d4edda;
+        color: #155724;
+      }
+
       .exercise-item h3 {
         margin: 0 0 10px 0;
         font-size: 18px;
@@ -1664,6 +1669,8 @@
             typeBadge = '<span class="exercise-type warmup">热身</span>';
           } else if (exercise.type === "stretch") {
             typeBadge = '<span class="exercise-type stretch">拉伸</span>';
+          } else if (exercise.type === "training") {
+            typeBadge = '<span class="exercise-type training">训练</span>';
           }
 
           exerciseItem.innerHTML = `
